@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P04 微笑傳染系統</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card hero-card">
+      <div class="hero-icon">😊</div>
+      <h1>P04 微笑傳染系統</h1>
+      <p class="subtitle">Smile Ripple System</p>
+      <p class="slogan">一個微笑，一句招呼，也能在校園裡慢慢傳開。</p>
+      <p class="description">
+        這是一個校園內的正向互動小系統。當他人以微笑、親切態度或善意互動帶來溫暖時，您可以透過掃描對方的 QR Code，表達鼓勵與感謝。
+      </p>
+    </section>
+
+    <section class="card">
+      <div id="welcomeBlock" class="hidden">
+        <p class="hello">您好，<span id="currentEmailText"></span></p>
+        <p class="hint">請點選以下功能。</p>
+      </div>
+
+      <div id="emailFormBlock" class="hidden">
+        <label for="emailInput" class="label">請輸入您的校園 Email</label>
+        <input id="emailInput" type="email" class="input" placeholder="例如：abc123@gms.tcu.edu.tw" autocomplete="email" />
+        <p class="small-note">只接受 <strong>@gms.tcu.edu.tw</strong> 結尾的信箱。</p>
+        <button id="saveEmailBtn" class="btn btn-primary full-width">儲存 Email</button>
+      </div>
+
+      <div class="button-group top-gap">
+        <a class="btn btn-secondary" href="myqrcode.html">顯示我的 QR Code</a>
+        <a class="btn btn-secondary" href="scan.html">掃描他人 QR Code</a>
+      </div>
+
+      <div class="button-group top-gap small-actions">
+        <button id="editEmailBtn" class="btn btn-light hidden" type="button">編輯 Email</button>
+        <button id="clearEmailBtn" class="btn btn-light hidden" type="button">清除本機 Email</button>
+      </div>
+
+      <div id="statusMessage" class="status-message"></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

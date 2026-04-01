@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的 QR Code</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container narrow">
+    <section class="card">
+      <h1>我的 QR Code</h1>
+      <p class="description">請將此 QR Code 出示給他人掃描。QRCode 內容直接為您的校園 Email。</p>
+
+      <div id="qrcodeEmailBlock" class="hidden">
+        <p class="hello">目前 Email：<span id="qrEmailText"></span></p>
+        <div id="qrcodeBox" class="qrcode-box"></div>
+      </div>
+
+      <div id="editBlock" class="top-gap">
+        <label for="qrEmailInput" class="label">編輯 Email</label>
+        <input id="qrEmailInput" type="email" class="input" placeholder="例如：abc123@gms.tcu.edu.tw" autocomplete="email" />
+        <div class="button-group top-gap">
+          <button id="updateEmailBtn" class="btn btn-primary" type="button">更新 Email</button>
+          <a class="btn btn-light" href="index.html">回主畫面</a>
+        </div>
+        <div id="qrStatusMessage" class="status-message"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="config.js"></script>
+  <script src="myqrcode.js"></script>
+</body>
+</html>
