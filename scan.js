@@ -3,20 +3,31 @@
   const scannerNotice = document.getElementById('scannerNotice');
   const scanStatusMessage = document.getElementById('scanStatusMessage');
   const scanResultBlock = document.getElementById('scanResultBlock');
+  const targetNicknameText = document.getElementById('targetNicknameText');
   const targetAccountText = document.getElementById('targetAccountText');
   const restartScanBtn = document.getElementById('restartScanBtn');
   const feedbackButtons = document.querySelectorAll('.feedback-btn');
 
   let html5QrCode = null;
   let targetAccount = '';
+  let targetNickname = '';
   let isScannerRunning = false;
 
   function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
   }
 
+  function normalizeNickname(value) {
+    return (value || '').trim();
+  }
+
   function isValidAccount(account) {
     return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(account));
+  }
+
+  function isValidNickname(nickname) {
+    const value = normalizeNickname(nickname);
+    return value.length > 0 && value.length <= config.NICKNAME_MAX_LENGTH;
   }
 
   function accountToEmail(account) {
@@ -25,6 +36,10 @@
 
   function getMyAccount() {
     return normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
+  }
+
+  function getMyNickname() {
+    return normalizeNickname(localStorage.getItem(config.STORAGE_KEY_NICKNAME));
   }
 
   function setMessage(element, message, type = '') {
@@ -45,14 +60,37 @@
     return true;
   }
 
-  function ensureMyAccount() {
+  function ensureMyProfile() {
     const myAccount = getMyAccount();
-    if (!isValidAccount(myAccount)) {
-      setMessage(scannerNotice, '尚未設定有效帳號，請先回主畫面輸入您的校園帳號。', 'error');
+    const myNickname = getMyNickname();
+    if (!isValidAccount(myAccount) || !isValidNickname(myNickname)) {
+      setMessage(scannerNotice, '尚未設定有效帳號與暱稱，請先回主畫面輸入資料。', 'error');
       return false;
     }
-    setMessage(scannerNotice, `目前使用者：${accountToEmail(myAccount)}`, 'success');
+    setMessage(scannerNotice, `目前使用者：${myNickname}（${accountToEmail(myAccount)}）`, 'success');
     return true;
+  }
+
+  function parseDecodedPayload(decodedText) {
+    const raw = (decodedText || '').trim();
+    if (!raw) return null;
+
+    try {
+      const obj = JSON.parse(raw);
+      const account = normalizeAccount(obj.account);
+      const nickname = normalizeNickname(obj.nickname);
+      if (isValidAccount(account) && isValidNickname(nickname)) {
+        return { account, nickname };
+      }
+    } catch (error) {
+      // 舊版純文字帳號 QRCode 相容
+    }
+
+    const fallbackAccount = normalizeAccount(raw);
+    if (isValidAccount(fallbackAccount)) {
+      return { account: fallbackAccount, nickname: fallbackAccount };
+    }
+    return null;
   }
 
   async function stopScanner() {
@@ -63,7 +101,7 @@
   }
 
   async function startScanner() {
-    if (!ensureMyAccount() || !ensureConfig()) return;
+    if (!ensureMyProfile() || !ensureConfig()) return;
 
     html5QrCode = new Html5Qrcode('reader');
     try {
@@ -71,12 +109,14 @@
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         async (decodedText) => {
-          const decodedAccount = normalizeAccount(decodedText);
-          if (!isValidAccount(decodedAccount)) {
-            setMessage(scanStatusMessage, '掃描內容不是有效帳號。', 'error');
+          const decoded = parseDecodedPayload(decodedText);
+          if (!decoded) {
+            setMessage(scanStatusMessage, '掃描內容不是有效的系統帳號資料。', 'error');
             return;
           }
-          targetAccount = decodedAccount;
+          targetAccount = decoded.account;
+          targetNickname = decoded.nickname;
+          targetNicknameText.textContent = targetNickname;
           targetAccountText.textContent = targetAccount;
           scanResultBlock.classList.remove('hidden');
           restartScanBtn.classList.remove('hidden');
@@ -94,10 +134,17 @@
 
   async function submitEvent(smileType) {
     const responderAccount = getMyAccount();
+    const responderNickname = getMyNickname();
     const smilerAccount = normalizeAccount(targetAccount);
+    const smilerNickname = normalizeNickname(targetNickname);
 
     if (!isValidAccount(responderAccount) || !isValidAccount(smilerAccount)) {
       setMessage(scanStatusMessage, '帳號資料不完整或格式錯誤。', 'error');
+      return;
+    }
+
+    if (!isValidNickname(responderNickname) || !isValidNickname(smilerNickname)) {
+      setMessage(scanStatusMessage, '暱稱資料不完整或格式錯誤。', 'error');
       return;
     }
 
@@ -115,7 +162,9 @@
 
     const payload = {
       smiler_account: smilerAccount,
+      smiler_nickname: smilerNickname,
       responder_account: responderAccount,
+      responder_nickname: responderNickname,
       smile_type: smileType,
       event_date: eventDate
     };
@@ -127,7 +176,7 @@
       if (error.code === '23505') {
         setMessage(scanStatusMessage, '今天已經表達過。', 'warn');
       } else if (error.code === '23514') {
-        setMessage(scanStatusMessage, '資料不符合資料庫限制，請確認帳號與輸入內容。', 'error');
+        setMessage(scanStatusMessage, '資料不符合資料庫限制，請確認帳號與暱稱內容。', 'error');
       } else {
         setMessage(scanStatusMessage, `送出失敗：${error.message}`, 'error');
       }
@@ -145,6 +194,7 @@
     scanResultBlock.classList.add('hidden');
     restartScanBtn.classList.add('hidden');
     targetAccount = '';
+    targetNickname = '';
     setMessage(scanStatusMessage, '已準備重新掃描。', 'warn');
     await startScanner();
   });

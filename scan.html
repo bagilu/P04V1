@@ -11,13 +11,14 @@
 <body>
   <div class="page-shell narrow-shell">
     <main class="content-card centered-card">
-      <h1>掃描他人 QRCode</h1>
+      <h1 class="page-title">掃描他人 QRCode</h1>
       <p id="scannerNotice" class="status-message"></p>
       <div id="reader" class="reader-box"></div>
       <p id="scanStatusMessage" class="status-message"></p>
 
       <section id="scanResultBlock" class="scan-result-block hidden">
         <h2>掃描結果</h2>
+        <p>對象暱稱：<strong id="targetNicknameText"></strong></p>
         <p>對象帳號：<strong id="targetAccountText"></strong><span class="inline-domain">@gms.tcu.edu.tw</span></p>
         <div class="feedback-grid">
           <button class="btn btn-feedback feedback-btn" data-type="溫馨笑容">溫馨笑容</button>

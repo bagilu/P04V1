@@ -57,14 +57,29 @@ a { text-decoration: none; }
   background: linear-gradient(135deg, #e9f1ff, #fff4da);
   border: 1px solid var(--line);
 }
-.hero-card h1, .content-card h1 {
+.hero-texts { flex: 1; }
+.hero-title-zh {
   margin: 0;
-  font-size: 2rem;
+  font-size: 2.15rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
-.subtitle {
-  margin: 6px 0 10px;
-  color: var(--primary-dark);
+.hero-meta {
+  margin: 6px 0 8px;
+  color: var(--sub);
+  font-size: 0.98rem;
   font-weight: 700;
+}
+.hero-title-en {
+  margin: 0 0 12px;
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+}
+.content-card h1, .page-title {
+  margin: 0;
+  font-size: 1.75rem;
 }
 .description {
   margin: 0 0 8px;
@@ -88,8 +103,8 @@ a { text-decoration: none; }
   margin-bottom: 10px;
 }
 .small-qr {
-  width: 140px;
-  min-height: 140px;
+  width: 132px;
+  min-height: 132px;
   margin: 0 auto 10px;
   display: grid;
   place-items: center;
@@ -109,6 +124,7 @@ a { text-decoration: none; }
   font-weight: 700;
   margin-bottom: 8px;
 }
+.mt-18 { margin-top: 18px; }
 .account-input-wrap {
   display: flex;
   flex-wrap: wrap;
@@ -121,6 +137,11 @@ input[type="text"] {
   border-radius: 12px;
   padding: 12px 14px;
   font-size: 1rem;
+}
+.input-hint {
+  margin: 8px 0 0;
+  color: var(--sub);
+  font-size: 0.9rem;
 }
 .fixed-domain, .inline-domain {
   color: var(--sub);
@@ -136,8 +157,14 @@ input[type="text"] {
   border-radius: 16px;
   background: #fafcff;
 }
+.current-nickname-text, .qr-nickname-display {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
 .current-account-text, .qr-account-display {
-  font-size: 1.1rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: var(--primary-dark);
 }
@@ -218,4 +245,6 @@ input[type="text"] {
   .hero-card { grid-template-columns: 1fr; }
   .main-actions { grid-template-columns: 1fr; }
   .current-account-card { flex-direction: column; align-items: flex-start; }
+  .hero-title-zh { font-size: 1.72rem; }
+  .hero-title-en { font-size: 1.05rem; }
 }

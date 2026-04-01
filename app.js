@@ -4,7 +4,9 @@
   const accountFormSection = document.getElementById('accountFormSection');
   const currentAccountSection = document.getElementById('currentAccountSection');
   const currentAccountText = document.getElementById('currentAccountText');
+  const currentNicknameText = document.getElementById('currentNicknameText');
   const accountInput = document.getElementById('accountInput');
+  const nicknameInput = document.getElementById('nicknameInput');
   const saveAccountBtn = document.getElementById('saveAccountBtn');
   const editAccountBtn = document.getElementById('editAccountBtn');
   const myQrBtn = document.getElementById('myQrBtn');
@@ -16,8 +18,17 @@
     return (value || '').trim().toLowerCase();
   }
 
+  function normalizeNickname(value) {
+    return (value || '').trim();
+  }
+
   function isValidAccount(account) {
     return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(account));
+  }
+
+  function isValidNickname(nickname) {
+    const value = normalizeNickname(nickname);
+    return value.length > 0 && value.length <= config.NICKNAME_MAX_LENGTH;
   }
 
   function accountToEmail(account) {
@@ -28,12 +39,18 @@
     return normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
   }
 
-  function setStoredAccount(account) {
-    localStorage.setItem(config.STORAGE_KEY_ACCOUNT, normalizeAccount(account));
+  function getStoredNickname() {
+    return normalizeNickname(localStorage.getItem(config.STORAGE_KEY_NICKNAME));
   }
 
-  function clearStoredAccount() {
+  function setStoredProfile(account, nickname) {
+    localStorage.setItem(config.STORAGE_KEY_ACCOUNT, normalizeAccount(account));
+    localStorage.setItem(config.STORAGE_KEY_NICKNAME, normalizeNickname(nickname));
+  }
+
+  function clearStoredProfile() {
     localStorage.removeItem(config.STORAGE_KEY_ACCOUNT);
+    localStorage.removeItem(config.STORAGE_KEY_NICKNAME);
   }
 
   function setMessage(message, type = '') {
@@ -44,17 +61,19 @@
 
   function refreshUI() {
     const account = getStoredAccount();
-    if (account && isValidAccount(account)) {
+    const nickname = getStoredNickname();
+    if (account && isValidAccount(account) && nickname && isValidNickname(nickname)) {
       accountFormSection.classList.add('hidden');
       currentAccountSection.classList.remove('hidden');
+      currentNicknameText.textContent = nickname;
       currentAccountText.textContent = accountToEmail(account);
-      welcomeText.textContent = `${accountToEmail(account)} 您好，請點選以下功能。`;
+      welcomeText.textContent = `${nickname} 您好，請點選以下功能。`;
       myQrBtn.disabled = false;
       scanBtn.disabled = false;
     } else {
       accountFormSection.classList.remove('hidden');
       currentAccountSection.classList.add('hidden');
-      welcomeText.textContent = '請先輸入您的校園帳號。';
+      welcomeText.textContent = '請先輸入您的校園帳號與暱稱。';
       myQrBtn.disabled = true;
       scanBtn.disabled = true;
     }
@@ -62,6 +81,8 @@
 
   saveAccountBtn?.addEventListener('click', () => {
     const account = normalizeAccount(accountInput.value);
+    const nickname = normalizeNickname(nicknameInput.value);
+
     if (!account) {
       setMessage('請輸入帳號。', 'error');
       return;
@@ -70,18 +91,26 @@
       setMessage('帳號格式不正確，請只輸入 @ 前面的帳號內容。', 'error');
       return;
     }
-    setStoredAccount(account);
+    if (!isValidNickname(nickname)) {
+      setMessage(`請輸入 1 到 ${config.NICKNAME_MAX_LENGTH} 字的暱稱。`, 'error');
+      return;
+    }
+
+    setStoredProfile(account, nickname);
     accountInput.value = account;
-    setMessage('帳號已儲存。', 'success');
+    nicknameInput.value = nickname;
+    setMessage('資料已儲存。', 'success');
     refreshUI();
   });
 
   editAccountBtn?.addEventListener('click', () => {
     const account = getStoredAccount();
+    const nickname = getStoredNickname();
     accountInput.value = account;
-    clearStoredAccount();
+    nicknameInput.value = nickname;
+    clearStoredProfile();
     refreshUI();
-    setMessage('請輸入新的帳號後重新儲存。', 'warn');
+    setMessage('請輸入新的帳號與暱稱後重新儲存。', 'warn');
     accountInput.focus();
   });
 
@@ -96,8 +125,8 @@
   if (systemEntryQr) {
     new QRCode(systemEntryQr, {
       text: config.SITE_URL,
-      width: 140,
-      height: 140,
+      width: 132,
+      height: 132,
       correctLevel: QRCode.CorrectLevel.M
     });
   }

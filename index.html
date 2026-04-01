@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>微笑傳染系統</title>
+  <title>慈濟大學微笑漣漪系統</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,9 +13,10 @@
     <header class="hero-card">
       <div class="hero-main">
         <div class="logo-badge">😊</div>
-        <div>
-          <h1>微笑傳染系統</h1>
-          <p class="subtitle">Smile Ripple System</p>
+        <div class="hero-texts">
+          <h1 class="hero-title-zh">慈濟大學微笑漣漪系統</h1>
+          <p class="hero-meta">（經營管理系學生專題）</p>
+          <p class="hero-title-en">TCU Smile ripple system</p>
           <p class="description">在校園裡，用一個微笑、一句招呼，讓善意被看見，讓溫暖被記錄。</p>
           <p class="slogan">一個微笑，可能就是別人今天重新相信自己的開始。</p>
         </div>
@@ -30,27 +31,35 @@
     <main class="content-card">
       <section class="welcome-block">
         <h2>開始使用</h2>
-        <p id="welcomeText">請先輸入您的校園帳號。</p>
+        <p id="welcomeText">請先輸入您的校園帳號與暱稱。</p>
       </section>
 
       <section id="accountFormSection" class="account-form-section hidden">
         <label for="accountInput" class="field-label">校園帳號</label>
         <div class="account-input-wrap">
-          <input id="accountInput" type="text" placeholder="例如 abc123" autocomplete="off">
+          <input id="accountInput" type="text" placeholder="例如 abc123" autocomplete="off" maxlength="40">
           <span class="fixed-domain">@gms.tcu.edu.tw</span>
         </div>
+
+        <label for="nicknameInput" class="field-label mt-18">暱稱</label>
+        <div class="account-input-wrap">
+          <input id="nicknameInput" type="text" placeholder="例如 王小明、李老師" autocomplete="off" maxlength="20">
+        </div>
+        <p class="input-hint">暱稱僅保存在目前裝置的瀏覽器中，長度上限 20 字。</p>
+
         <div class="action-row compact-row">
-          <button id="saveAccountBtn" class="btn btn-primary">儲存帳號</button>
+          <button id="saveAccountBtn" class="btn btn-primary">儲存資料</button>
         </div>
       </section>
 
       <section id="currentAccountSection" class="current-account-section hidden">
         <div class="current-account-card">
           <div>
-            <div class="mini-label">目前帳號</div>
+            <div class="mini-label">目前資料</div>
+            <div id="currentNicknameText" class="current-nickname-text"></div>
             <div id="currentAccountText" class="current-account-text"></div>
           </div>
-          <button id="editAccountBtn" class="btn btn-secondary">修改帳號</button>
+          <button id="editAccountBtn" class="btn btn-secondary">修改資料</button>
         </div>
       </section>
 
