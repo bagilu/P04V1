@@ -13,6 +13,9 @@
   const scanBtn = document.getElementById('scanBtn');
   const indexMessage = document.getElementById('indexMessage');
   const systemEntryQr = document.getElementById('systemEntryQr');
+  const totalSmileCount = document.getElementById('totalSmileCount');
+  const smilerRankingList = document.getElementById('smilerRankingList');
+  const responderRankingList = document.getElementById('responderRankingList');
 
   function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
@@ -79,6 +82,106 @@
     }
   }
 
+  function ensureConfigAvailable() {
+    return Boolean(
+      config.SUPABASE_URL &&
+      !config.SUPABASE_URL.includes('YOUR-PROJECT') &&
+      config.SUPABASE_ANON_KEY &&
+      !config.SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY')
+    );
+  }
+
+  function renderPlaceholder(listElement, text) {
+    if (!listElement) return;
+    listElement.innerHTML = `<li class="leaderboard-placeholder">${text}</li>`;
+  }
+
+  function renderRanking(listElement, rankingData) {
+    if (!listElement) return;
+    if (!rankingData.length) {
+      renderPlaceholder(listElement, '目前尚無資料');
+      return;
+    }
+    listElement.innerHTML = rankingData.map((item, index) => {
+      const safeNickname = item.nickname || item.account;
+      return `<li><span class="rank-order">${index + 1}.</span><span class="rank-name">${safeNickname}</span><span class="rank-count">${item.count} 次</span></li>`;
+    }).join('');
+  }
+
+  function buildRanking(rows, rolePrefix) {
+    const counter = new Map();
+    const latestNicknameByAccount = new Map();
+    const latestTimeByAccount = new Map();
+
+    rows.forEach((row) => {
+      const account = normalizeAccount(row[`${rolePrefix}_account`]);
+      const nickname = normalizeNickname(row[`${rolePrefix}_nickname`]);
+      const createdAt = row.created_at || '';
+      if (!account) return;
+
+      counter.set(account, (counter.get(account) || 0) + 1);
+
+      const existingTime = latestTimeByAccount.get(account) || '';
+      if (!existingTime || createdAt >= existingTime) {
+        latestTimeByAccount.set(account, createdAt);
+        latestNicknameByAccount.set(account, nickname || account);
+      }
+    });
+
+    return Array.from(counter.entries())
+      .map(([account, count]) => ({
+        account,
+        nickname: latestNicknameByAccount.get(account) || account,
+        count
+      }))
+      .sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        return a.account.localeCompare(b.account, 'zh-Hant');
+      })
+      .slice(0, 10);
+  }
+
+  async function loadHomepageStats() {
+    if (!ensureConfigAvailable()) {
+      totalSmileCount.textContent = '--';
+      renderPlaceholder(smilerRankingList, '請先設定 Supabase');
+      renderPlaceholder(responderRankingList, '請先設定 Supabase');
+      return;
+    }
+
+    const supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+    const { count, error: countError } = await supabase
+      .from(config.TABLE_SMILE_EVENTS)
+      .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+      console.error(countError);
+      totalSmileCount.textContent = '--';
+      renderPlaceholder(smilerRankingList, '讀取失敗');
+      renderPlaceholder(responderRankingList, '讀取失敗');
+      return;
+    }
+
+    totalSmileCount.textContent = count ?? 0;
+
+    const { data: rows, error: rowsError } = await supabase
+      .from(config.TABLE_SMILE_EVENTS)
+      .select('smiler_account, smiler_nickname, responder_account, responder_nickname, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5000);
+
+    if (rowsError) {
+      console.error(rowsError);
+      renderPlaceholder(smilerRankingList, '讀取失敗');
+      renderPlaceholder(responderRankingList, '讀取失敗');
+      return;
+    }
+
+    renderRanking(smilerRankingList, buildRanking(rows || [], 'smiler'));
+    renderRanking(responderRankingList, buildRanking(rows || [], 'responder'));
+  }
+
   saveAccountBtn?.addEventListener('click', () => {
     const account = normalizeAccount(accountInput.value);
     const nickname = normalizeNickname(nicknameInput.value);
@@ -132,4 +235,5 @@
   }
 
   refreshUI();
+  loadHomepageStats();
 })();

@@ -15,7 +15,7 @@
         <div class="logo-badge">😊</div>
         <div class="hero-texts">
           <h1 class="hero-title-zh">慈濟大學微笑漣漪系統</h1>
-          <p class="hero-meta">（經營管理系學生專題）</p>
+          <p class="hero-meta">（經營管理學系學生專題）</p>
           <p class="hero-title-en">TCU Smile ripple system</p>
           <p class="description">在校園裡，用一個微笑、一句招呼，讓善意被看見，讓溫暖被記錄。</p>
           <p class="slogan">一個微笑，可能就是別人今天重新相信自己的開始。</p>
@@ -32,6 +32,13 @@
       <section class="welcome-block">
         <h2>開始使用</h2>
         <p id="welcomeText">請先輸入您的校園帳號與暱稱。</p>
+      </section>
+
+      <section class="stats-strip">
+        <div class="stats-card">
+          <div class="stats-label">系統累計微笑次數</div>
+          <div class="stats-value"><span id="totalSmileCount">--</span><span class="stats-unit">次</span></div>
+        </div>
       </section>
 
       <section id="accountFormSection" class="account-form-section hidden">
@@ -69,6 +76,21 @@
       </section>
 
       <p id="indexMessage" class="status-message"></p>
+
+      <section class="leaderboard-section">
+        <div class="leaderboard-card leaderboard-card-primary">
+          <h3>前 10 名微笑王</h3>
+          <ol id="smilerRankingList" class="leaderboard-list">
+            <li class="leaderboard-placeholder">讀取中…</li>
+          </ol>
+        </div>
+        <div class="leaderboard-card leaderboard-card-accent">
+          <h3>前 10 名回應王</h3>
+          <ol id="responderRankingList" class="leaderboard-list">
+            <li class="leaderboard-placeholder">讀取中…</li>
+          </ol>
+        </div>
+      </section>
     </main>
   </div>
 
