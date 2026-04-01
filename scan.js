@@ -3,24 +3,28 @@
   const scannerNotice = document.getElementById('scannerNotice');
   const scanStatusMessage = document.getElementById('scanStatusMessage');
   const scanResultBlock = document.getElementById('scanResultBlock');
-  const targetEmailText = document.getElementById('targetEmailText');
+  const targetAccountText = document.getElementById('targetAccountText');
   const restartScanBtn = document.getElementById('restartScanBtn');
   const feedbackButtons = document.querySelectorAll('.feedback-btn');
 
   let html5QrCode = null;
-  let targetEmail = '';
+  let targetAccount = '';
   let isScannerRunning = false;
 
-  function normalizeEmail(value) {
+  function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
   }
 
-  function isValidCampusEmail(email) {
-    return /^[a-zA-Z0-9._%+-]+@gms\.tcu\.edu\.tw$/.test(normalizeEmail(email));
+  function isValidAccount(account) {
+    return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(account));
   }
 
-  function getMyEmail() {
-    return normalizeEmail(localStorage.getItem(config.STORAGE_KEY_EMAIL));
+  function accountToEmail(account) {
+    return `${normalizeAccount(account)}${config.EMAIL_DOMAIN}`;
+  }
+
+  function getMyAccount() {
+    return normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
   }
 
   function setMessage(element, message, type = '') {
@@ -41,13 +45,13 @@
     return true;
   }
 
-  function ensureMyEmail() {
-    const myEmail = getMyEmail();
-    if (!isValidCampusEmail(myEmail)) {
-      setMessage(scannerNotice, '尚未設定有效 Email，請先回主畫面輸入您的校園 Email。', 'error');
+  function ensureMyAccount() {
+    const myAccount = getMyAccount();
+    if (!isValidAccount(myAccount)) {
+      setMessage(scannerNotice, '尚未設定有效帳號，請先回主畫面輸入您的校園帳號。', 'error');
       return false;
     }
-    setMessage(scannerNotice, `目前使用者：${myEmail}`, 'success');
+    setMessage(scannerNotice, `目前使用者：${accountToEmail(myAccount)}`, 'success');
     return true;
   }
 
@@ -59,7 +63,7 @@
   }
 
   async function startScanner() {
-    if (!ensureMyEmail() || !ensureConfig()) return;
+    if (!ensureMyAccount() || !ensureConfig()) return;
 
     html5QrCode = new Html5Qrcode('reader');
     try {
@@ -67,13 +71,13 @@
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         async (decodedText) => {
-          const decodedEmail = normalizeEmail(decodedText);
-          if (!isValidCampusEmail(decodedEmail)) {
-            setMessage(scanStatusMessage, '掃描內容不是有效的 @gms.tcu.edu.tw Email。', 'error');
+          const decodedAccount = normalizeAccount(decodedText);
+          if (!isValidAccount(decodedAccount)) {
+            setMessage(scanStatusMessage, '掃描內容不是有效帳號。', 'error');
             return;
           }
-          targetEmail = decodedEmail;
-          targetEmailText.textContent = targetEmail;
+          targetAccount = decodedAccount;
+          targetAccountText.textContent = targetAccount;
           scanResultBlock.classList.remove('hidden');
           restartScanBtn.classList.remove('hidden');
           await stopScanner();
@@ -89,16 +93,15 @@
   }
 
   async function submitEvent(smileType) {
-    const myEmail = getMyEmail();
-    const responderEmail = myEmail;
-    const smilerEmail = normalizeEmail(targetEmail);
+    const responderAccount = getMyAccount();
+    const smilerAccount = normalizeAccount(targetAccount);
 
-    if (!isValidCampusEmail(responderEmail) || !isValidCampusEmail(smilerEmail)) {
-      setMessage(scanStatusMessage, 'Email 資料不完整或格式錯誤。', 'error');
+    if (!isValidAccount(responderAccount) || !isValidAccount(smilerAccount)) {
+      setMessage(scanStatusMessage, '帳號資料不完整或格式錯誤。', 'error');
       return;
     }
 
-    if (responderEmail === smilerEmail) {
+    if (responderAccount === smilerAccount) {
       setMessage(scanStatusMessage, '不能對自己送出肯定。', 'error');
       return;
     }
@@ -111,8 +114,8 @@
     const eventDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     const payload = {
-      smiler_email: smilerEmail,
-      responder_email: responderEmail,
+      smiler_account: smilerAccount,
+      responder_account: responderAccount,
       smile_type: smileType,
       event_date: eventDate
     };
@@ -124,7 +127,7 @@
       if (error.code === '23505') {
         setMessage(scanStatusMessage, '今天已經表達過。', 'warn');
       } else if (error.code === '23514') {
-        setMessage(scanStatusMessage, '資料不符合資料庫限制，請確認 Email 與輸入內容。', 'error');
+        setMessage(scanStatusMessage, '資料不符合資料庫限制，請確認帳號與輸入內容。', 'error');
       } else {
         setMessage(scanStatusMessage, `送出失敗：${error.message}`, 'error');
       }
@@ -141,7 +144,7 @@
   restartScanBtn?.addEventListener('click', async () => {
     scanResultBlock.classList.add('hidden');
     restartScanBtn.classList.add('hidden');
-    targetEmail = '';
+    targetAccount = '';
     setMessage(scanStatusMessage, '已準備重新掃描。', 'warn');
     await startScanner();
   });

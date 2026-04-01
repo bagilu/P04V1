@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>掃描他人 QR Code</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>掃描他人 QRCode</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <main class="container narrow">
-    <section class="card">
-      <h1>掃描他人 QR Code</h1>
-      <p class="description">請使用手機鏡頭掃描對方的 QR Code。掃描成功後，系統會顯示對方 Email 與表達按鈕。</p>
+  <div class="page-shell narrow-shell">
+    <main class="content-card centered-card">
+      <h1>掃描他人 QRCode</h1>
+      <p id="scannerNotice" class="status-message"></p>
+      <div id="reader" class="reader-box"></div>
+      <p id="scanStatusMessage" class="status-message"></p>
 
-      <div id="scannerNotice" class="status-message"></div>
-      <div id="reader" class="scanner-box"></div>
-
-      <div id="scanResultBlock" class="hidden top-gap">
+      <section id="scanResultBlock" class="scan-result-block hidden">
         <h2>掃描結果</h2>
-        <p class="hello">對方 Email：<span id="targetEmailText"></span></p>
-        <p class="small-note">請選擇一種表達方式：</p>
-
-        <div class="button-stack top-gap">
-          <button class="btn btn-primary feedback-btn" data-type="溫馨笑容">溫馨笑容</button>
-          <button class="btn btn-primary feedback-btn" data-type="親切態度">親切態度</button>
-          <button class="btn btn-primary feedback-btn" data-type="其他感謝或鼓勵">其他感謝或鼓勵</button>
+        <p>對象帳號：<strong id="targetAccountText"></strong><span class="inline-domain">@gms.tcu.edu.tw</span></p>
+        <div class="feedback-grid">
+          <button class="btn btn-feedback feedback-btn" data-type="溫馨笑容">溫馨笑容</button>
+          <button class="btn btn-feedback feedback-btn" data-type="親切態度">親切態度</button>
+          <button class="btn btn-feedback feedback-btn" data-type="其他感謝或鼓勵">其他感謝或鼓勵</button>
         </div>
+      </section>
+
+      <div class="action-row">
+        <button id="restartScanBtn" class="btn btn-secondary hidden">重新掃描</button>
+        <a href="index.html" class="btn btn-primary">回到主畫面</a>
       </div>
+    </main>
+  </div>
 
-      <div class="button-group top-gap">
-        <button id="restartScanBtn" class="btn btn-light hidden" type="button">重新掃描</button>
-        <a class="btn btn-light" href="index.html">回主畫面</a>
-      </div>
-
-      <div id="scanStatusMessage" class="status-message"></div>
-    </section>
-  </main>
-
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="scan.js"></script>
 </body>

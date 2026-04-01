@@ -1,89 +1,106 @@
 (function () {
   const config = window.APP_CONFIG;
-  const emailInput = document.getElementById('emailInput');
-  const saveEmailBtn = document.getElementById('saveEmailBtn');
-  const welcomeBlock = document.getElementById('welcomeBlock');
-  const emailFormBlock = document.getElementById('emailFormBlock');
-  const currentEmailText = document.getElementById('currentEmailText');
-  const statusMessage = document.getElementById('statusMessage');
-  const editEmailBtn = document.getElementById('editEmailBtn');
-  const clearEmailBtn = document.getElementById('clearEmailBtn');
+  const welcomeText = document.getElementById('welcomeText');
+  const accountFormSection = document.getElementById('accountFormSection');
+  const currentAccountSection = document.getElementById('currentAccountSection');
+  const currentAccountText = document.getElementById('currentAccountText');
+  const accountInput = document.getElementById('accountInput');
+  const saveAccountBtn = document.getElementById('saveAccountBtn');
+  const editAccountBtn = document.getElementById('editAccountBtn');
+  const myQrBtn = document.getElementById('myQrBtn');
+  const scanBtn = document.getElementById('scanBtn');
+  const indexMessage = document.getElementById('indexMessage');
+  const systemEntryQr = document.getElementById('systemEntryQr');
 
-  function normalizeEmail(value) {
+  function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
   }
 
-  function isValidCampusEmail(email) {
-    const value = normalizeEmail(email);
-    return /^[a-zA-Z0-9._%+-]+@gms\.tcu\.edu\.tw$/.test(value);
+  function isValidAccount(account) {
+    return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(account));
   }
 
-  function setStatus(message, type = '') {
-    statusMessage.textContent = message;
-    statusMessage.className = 'status-message';
-    if (type) {
-      statusMessage.classList.add(type);
-    }
+  function accountToEmail(account) {
+    return `${normalizeAccount(account)}${config.EMAIL_DOMAIN}`;
   }
 
-  function getStoredEmail() {
-    return normalizeEmail(localStorage.getItem(config.STORAGE_KEY_EMAIL));
+  function getStoredAccount() {
+    return normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
   }
 
-  function saveEmail(email) {
-    localStorage.setItem(config.STORAGE_KEY_EMAIL, normalizeEmail(email));
+  function setStoredAccount(account) {
+    localStorage.setItem(config.STORAGE_KEY_ACCOUNT, normalizeAccount(account));
   }
 
-  function showFormMode() {
-    emailFormBlock.classList.remove('hidden');
-    welcomeBlock.classList.add('hidden');
-    editEmailBtn.classList.add('hidden');
-    clearEmailBtn.classList.add('hidden');
+  function clearStoredAccount() {
+    localStorage.removeItem(config.STORAGE_KEY_ACCOUNT);
   }
 
-  function showWelcomeMode(email) {
-    currentEmailText.textContent = email;
-    welcomeBlock.classList.remove('hidden');
-    emailFormBlock.classList.add('hidden');
-    editEmailBtn.classList.remove('hidden');
-    clearEmailBtn.classList.remove('hidden');
+  function setMessage(message, type = '') {
+    indexMessage.textContent = message;
+    indexMessage.className = 'status-message';
+    if (type) indexMessage.classList.add(type);
   }
 
-  function init() {
-    const storedEmail = getStoredEmail();
-    if (storedEmail && isValidCampusEmail(storedEmail)) {
-      showWelcomeMode(storedEmail);
+  function refreshUI() {
+    const account = getStoredAccount();
+    if (account && isValidAccount(account)) {
+      accountFormSection.classList.add('hidden');
+      currentAccountSection.classList.remove('hidden');
+      currentAccountText.textContent = accountToEmail(account);
+      welcomeText.textContent = `${accountToEmail(account)} 您好，請點選以下功能。`;
+      myQrBtn.disabled = false;
+      scanBtn.disabled = false;
     } else {
-      localStorage.removeItem(config.STORAGE_KEY_EMAIL);
-      showFormMode();
+      accountFormSection.classList.remove('hidden');
+      currentAccountSection.classList.add('hidden');
+      welcomeText.textContent = '請先輸入您的校園帳號。';
+      myQrBtn.disabled = true;
+      scanBtn.disabled = true;
     }
   }
 
-  saveEmailBtn?.addEventListener('click', () => {
-    const email = normalizeEmail(emailInput.value);
-    if (!isValidCampusEmail(email)) {
-      setStatus('請輸入正確的校園 Email，且必須以 @gms.tcu.edu.tw 結尾。', 'error');
+  saveAccountBtn?.addEventListener('click', () => {
+    const account = normalizeAccount(accountInput.value);
+    if (!account) {
+      setMessage('請輸入帳號。', 'error');
       return;
     }
-    saveEmail(email);
-    setStatus('Email 已儲存。', 'success');
-    showWelcomeMode(email);
-    emailInput.value = email;
+    if (!isValidAccount(account)) {
+      setMessage('帳號格式不正確，請只輸入 @ 前面的帳號內容。', 'error');
+      return;
+    }
+    setStoredAccount(account);
+    accountInput.value = account;
+    setMessage('帳號已儲存。', 'success');
+    refreshUI();
   });
 
-  editEmailBtn?.addEventListener('click', () => {
-    const storedEmail = getStoredEmail();
-    emailInput.value = storedEmail;
-    showFormMode();
-    setStatus('請重新輸入 Email 後按下儲存。', 'warn');
+  editAccountBtn?.addEventListener('click', () => {
+    const account = getStoredAccount();
+    accountInput.value = account;
+    clearStoredAccount();
+    refreshUI();
+    setMessage('請輸入新的帳號後重新儲存。', 'warn');
+    accountInput.focus();
   });
 
-  clearEmailBtn?.addEventListener('click', () => {
-    localStorage.removeItem(config.STORAGE_KEY_EMAIL);
-    emailInput.value = '';
-    showFormMode();
-    setStatus('本機 Email 已清除。', 'success');
+  myQrBtn?.addEventListener('click', () => {
+    window.location.href = 'myqrcode.html';
   });
 
-  init();
+  scanBtn?.addEventListener('click', () => {
+    window.location.href = 'scan.html';
+  });
+
+  if (systemEntryQr) {
+    new QRCode(systemEntryQr, {
+      text: config.SITE_URL,
+      width: 140,
+      height: 140,
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  refreshUI();
 })();

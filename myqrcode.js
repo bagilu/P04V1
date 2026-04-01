@@ -1,66 +1,43 @@
 (function () {
   const config = window.APP_CONFIG;
-  const qrcodeEmailBlock = document.getElementById('qrcodeEmailBlock');
-  const qrEmailText = document.getElementById('qrEmailText');
-  const qrcodeBox = document.getElementById('qrcodeBox');
-  const qrEmailInput = document.getElementById('qrEmailInput');
-  const updateEmailBtn = document.getElementById('updateEmailBtn');
-  const qrStatusMessage = document.getElementById('qrStatusMessage');
+  const myAccountDisplay = document.getElementById('myAccountDisplay');
+  const myQrCodeBox = document.getElementById('myQrCodeBox');
+  const myQrMessage = document.getElementById('myQrMessage');
+  const editAccountBtn = document.getElementById('editAccountBtn');
 
-  function normalizeEmail(value) {
+  function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
   }
 
-  function isValidCampusEmail(email) {
-    return /^[a-zA-Z0-9._%+-]+@gms\.tcu\.edu\.tw$/.test(normalizeEmail(email));
+  function isValidAccount(account) {
+    return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(account));
   }
 
-  function getStoredEmail() {
-    return normalizeEmail(localStorage.getItem(config.STORAGE_KEY_EMAIL));
+  function accountToEmail(account) {
+    return `${normalizeAccount(account)}${config.EMAIL_DOMAIN}`;
   }
 
-  function saveEmail(email) {
-    localStorage.setItem(config.STORAGE_KEY_EMAIL, normalizeEmail(email));
+  function setMessage(message, type = '') {
+    myQrMessage.textContent = message;
+    myQrMessage.className = 'status-message';
+    if (type) myQrMessage.classList.add(type);
   }
 
-  function setStatus(message, type = '') {
-    qrStatusMessage.textContent = message;
-    qrStatusMessage.className = 'status-message';
-    if (type) qrStatusMessage.classList.add(type);
-  }
-
-  function renderQr(email) {
-    qrcodeBox.innerHTML = '';
-    qrEmailText.textContent = email;
-    qrEmailInput.value = email;
-    new QRCode(qrcodeBox, {
-      text: email,
-      width: 240,
-      height: 240
+  const account = normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
+  if (!isValidAccount(account)) {
+    setMessage('尚未設定有效帳號，請先回到主畫面輸入帳號。', 'error');
+  } else {
+    myAccountDisplay.textContent = accountToEmail(account);
+    new QRCode(myQrCodeBox, {
+      text: account,
+      width: 200,
+      height: 200,
+      correctLevel: QRCode.CorrectLevel.M
     });
-    qrcodeEmailBlock.classList.remove('hidden');
+    setMessage('此 QRCode 內容為帳號本身，掃描後系統會自動補上固定網域。', 'success');
   }
 
-  function init() {
-    const email = getStoredEmail();
-    if (!isValidCampusEmail(email)) {
-      setStatus('尚未設定有效 Email，請先回主頁輸入。', 'error');
-      qrcodeEmailBlock.classList.add('hidden');
-      return;
-    }
-    renderQr(email);
-  }
-
-  updateEmailBtn?.addEventListener('click', () => {
-    const email = normalizeEmail(qrEmailInput.value);
-    if (!isValidCampusEmail(email)) {
-      setStatus('請輸入正確的校園 Email，且必須以 @gms.tcu.edu.tw 結尾。', 'error');
-      return;
-    }
-    saveEmail(email);
-    renderQr(email);
-    setStatus('Email 已更新，QRCode 已重新產生。', 'success');
+  editAccountBtn?.addEventListener('click', () => {
+    window.location.href = 'index.html';
   });
-
-  init();
 })();
