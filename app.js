@@ -65,6 +65,7 @@
   function refreshUI() {
     const account = getStoredAccount();
     const nickname = getStoredNickname();
+
     if (account && isValidAccount(account) && nickname && isValidNickname(nickname)) {
       accountFormSection.classList.add('hidden');
       currentAccountSection.classList.remove('hidden');

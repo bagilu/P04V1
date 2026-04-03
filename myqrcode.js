@@ -41,13 +41,15 @@
   } else {
     myNicknameDisplay.textContent = nickname;
     myAccountDisplay.textContent = accountToEmail(account);
+
     new QRCode(myQrCodeBox, {
-      text: JSON.stringify({ account, nickname }),
+      text: accountToEmail(account),
       width: 200,
       height: 200,
       correctLevel: QRCode.CorrectLevel.M
     });
-    setMessage('此 QRCode 內容包含帳號與暱稱，掃描後系統會自動帶出資料。', 'success');
+
+    setMessage('此 QRCode 內容為完整校園 Email，掃描後系統會自動轉換為帳號。', 'success');
   }
 
   editAccountBtn?.addEventListener('click', () => {
