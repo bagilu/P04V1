@@ -9,6 +9,7 @@
 
   let html5QrCode = null;
   let targetAccount = '';
+  let targetNickname = '';
   let isScannerRunning = false;
 
   function normalizeAccount(value) {
@@ -51,6 +52,10 @@
     element.textContent = message;
     element.className = 'status-message';
     if (type) element.classList.add(type);
+  }
+
+  function createSupabaseClient() {
+    return window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
   }
 
   function ensureConfig() {
@@ -102,6 +107,45 @@
     }
   }
 
+  async function findLatestNicknameByRole(supabase, account, rolePrefix) {
+    const nicknameField = `${rolePrefix}_nickname`;
+    const accountField = `${rolePrefix}_account`;
+
+    const { data, error } = await supabase
+      .from(config.TABLE_SMILE_EVENTS)
+      .select(`${nicknameField}, created_at`)
+      .eq(accountField, account)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) {
+      console.warn(`查詢 ${rolePrefix} 暱稱失敗`, error);
+      return '';
+    }
+
+    const rows = data || [];
+    for (const row of rows) {
+      const nickname = normalizeNickname(row[nicknameField]);
+      if (nickname && nickname !== account) return nickname;
+    }
+    return '';
+  }
+
+  async function findLatestKnownNickname(account) {
+    const normalizedAccount = normalizeAccount(account);
+    if (!isValidAccount(normalizedAccount)) return '';
+
+    const supabase = createSupabaseClient();
+
+    const responderNickname = await findLatestNicknameByRole(supabase, normalizedAccount, 'responder');
+    if (responderNickname) return responderNickname;
+
+    const smilerNickname = await findLatestNicknameByRole(supabase, normalizedAccount, 'smiler');
+    if (smilerNickname) return smilerNickname;
+
+    return '';
+  }
+
   async function startScanner() {
     if (!ensureMyProfile() || !ensureConfig()) return;
 
@@ -129,12 +173,17 @@
           }
 
           targetAccount = decodedAccount;
+          targetNickname = await findLatestKnownNickname(targetAccount);
           targetAccountText.textContent = targetAccount;
           scanResultBlock.classList.remove('hidden');
           restartScanBtn.classList.remove('hidden');
 
           await stopScanner();
-          setMessage(scanStatusMessage, '掃描成功，請選擇一種表達方式。', 'success');
+          if (targetNickname) {
+            setMessage(scanStatusMessage, `掃描成功，已辨識對象暱稱為「${targetNickname}」，請選擇一種表達方式。`, 'success');
+          } else {
+            setMessage(scanStatusMessage, '掃描成功，但目前查不到對方既有暱稱，系統將以「（尚未設定暱稱）」記錄。', 'warn');
+          }
         },
         () => {}
       );
@@ -151,7 +200,7 @@
     const responderAccount = getMyAccount();
     const responderNickname = getMyNickname();
     const smilerAccount = normalizeAccount(targetAccount);
-    const smilerNickname = smilerAccount;
+    const smilerNickname = normalizeNickname(targetNickname) || '（尚未設定暱稱）';
 
     if (!isValidAccount(responderAccount) || !isValidAccount(smilerAccount)) {
       setMessage(scanStatusMessage, '帳號資料不完整或格式錯誤。', 'error');
@@ -171,7 +220,7 @@
     feedbackButtons.forEach(btn => btn.disabled = true);
     setMessage(scanStatusMessage, '資料送出中，請稍候。', 'warn');
 
-    const supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    const supabase = createSupabaseClient();
     const today = new Date();
     const eventDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
@@ -209,6 +258,7 @@
     scanResultBlock.classList.add('hidden');
     restartScanBtn.classList.add('hidden');
     targetAccount = '';
+    targetNickname = '';
     setMessage(scanStatusMessage, '已準備重新掃描。', 'warn');
     await startScanner();
   });

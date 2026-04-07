@@ -350,3 +350,69 @@ input[type="text"] {
   .hero-title-zh { font-size: 1.72rem; }
   .hero-title-en { font-size: 1.05rem; }
 }
+
+.admin-entry-row {
+  margin: 6px 0 18px;
+  text-align: right;
+}
+.admin-entry-link {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+.admin-entry-link:hover {
+  text-decoration: underline;
+}
+.admin-filter-card {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fafcff;
+}
+.admin-filter-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+input[type="date"] {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+}
+.admin-stats-strip {
+  margin-top: 18px;
+}
+.admin-table-wrap {
+  margin-top: 18px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  min-width: 900px;
+}
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.admin-table th {
+  background: #f3f7ff;
+  font-weight: 800;
+}
+.table-placeholder {
+  text-align: center !important;
+  color: var(--sub);
+}
+@media (max-width: 720px) {
+  .admin-entry-row {
+    text-align: left;
+  }
+}

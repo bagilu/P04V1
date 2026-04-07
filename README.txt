@@ -24,3 +24,12 @@ P04 微笑漣漪系統（Email QR 穩定版）
 6. 若改動 JS 後未生效，請在瀏覽器執行 Ctrl+F5 強制重新整理。
 7. 若 Supabase 建表後 API 尚未更新，可在 SQL Editor 執行：
    NOTIFY pgrst, 'reload schema';
+
+8. 新增 admin.html：
+   - 可依 event_date 查詢當日全部紀錄
+   - 目前以前端 ADMIN_ACCOUNTS 白名單限制
+   - 請在 config.js 把 your_admin_account 改成您的帳號
+9. smiler_nickname 已改為：
+   - 掃描後先嘗試到資料庫查找該 account 最近一次已知暱稱
+   - 優先使用 responder_nickname
+   - 若查不到，才以「（尚未設定暱稱）」存入
