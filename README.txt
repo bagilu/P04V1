@@ -1,35 +1,58 @@
-P04 微笑漣漪系統（Email QR 穩定版）
+P04 微笑漣漪系統（Edge Function 版本）
 
-1. 請先在 config.js 填入正確的 SUPABASE_URL 與 SUPABASE_ANON_KEY。
-2. 本版本採用：
-   - 前端只輸入 @ 前面的帳號
-   - localStorage 記錄帳號與暱稱
-   - 我的 QRCode 內容固定為：account@gms.tcu.edu.tw
-   - 掃描器會自動把完整 Email 去掉 @gms.tcu.edu.tw，轉成 account
-   - 資料庫只存 account
-3. 目前資料庫欄位應使用：
-   - smiler_account
-   - smiler_nickname
-   - responder_account
-   - responder_nickname
-   - smile_type
-   - event_date
-   - created_at
-4. 首頁新增：
-   - 系統累計微笑次數
-   - 前 10 名微笑王
-   - 前 10 名回應王
-   排行榜以 account 統計，顯示該 account 最新一次出現的暱稱。
-5. 排行榜已改成較淺的顏色，避免與主按鈕混淆。
-6. 若改動 JS 後未生效，請在瀏覽器執行 Ctrl+F5 強制重新整理。
-7. 若 Supabase 建表後 API 尚未更新，可在 SQL Editor 執行：
-   NOTIFY pgrst, 'reload schema';
+本版本重點：
+0. 管理查詢頁不再出現在主畫面連結中，改為隱藏網址入口。
+1. 前端不再直接讀寫資料表。
+2. 首頁統計、掃描送出、管理者日期查詢，全部改走 Supabase Edge Functions。
+3. 建議將 public schema 相關資料表開啟 RLS，且不提供前端直接 policy。
+4. submit-smile-event 會在後端自動查找 smiler_nickname，不再直接把 account 寫進 smiler_nickname。
+5. admin.html 改成輸入「管理碼」後查詢；管理碼保存在 Edge Function secret，不寫在前端。
 
-8. 新增 admin.html：
-   - 可依 event_date 查詢當日全部紀錄
-   - 目前以前端 ADMIN_ACCOUNTS 白名單限制
-   - 請在 config.js 把 your_admin_account 改成您的帳號
-9. smiler_nickname 已改為：
-   - 掃描後先嘗試到資料庫查找該 account 最近一次已知暱稱
-   - 優先使用 responder_nickname
-   - 若查不到，才以「（尚未設定暱稱）」存入
+-----------------------------------
+一、前端要設定的檔案
+-----------------------------------
+請修改 config.js：
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- SITE_URL（若 GitHub Pages 網址有變）
+
+-----------------------------------
+二、Supabase 端要部署的內容
+-----------------------------------
+請把本 ZIP 中的 supabase 資料夾放到您的本機專案目錄。
+
+建議流程：
+1. 安裝 Supabase CLI
+2. 登入：supabase login
+3. 連結專案：supabase link --project-ref 您的 project ref
+4. 設定 secret：
+   supabase secrets set ADMIN_ACCESS_CODE=您自己設定的管理碼
+5. 部署 functions：
+   supabase functions deploy get-home-stats
+   supabase functions deploy submit-smile-event
+   supabase functions deploy get-records-by-date
+
+-----------------------------------
+三、資料庫安全建議
+-----------------------------------
+請在 SQL Editor 執行 sql_setup.sql。
+這個檔案會：
+- 對 tblp04smileevents 開啟 RLS
+- 對 tblp04maillog 開啟 RLS
+- 不開放 anon / authenticated 直接存取資料表
+- 保留 Edge Function 使用 service_role 存取
+
+-----------------------------------
+四、admin.html 使用方式
+-----------------------------------
+1. 直接輸入您自己知道的隱藏網址 hidden-records-portal.html
+2. 輸入 ADMIN_ACCESS_CODE 對應的管理密碼
+3. 選擇日期
+4. 按「查詢紀錄」
+
+-----------------------------------
+五、注意事項
+-----------------------------------
+1. Edge Function 若尚未部署成功，瀏覽器可能只看到 Failed to send a request to the Edge Function。
+2. 若 function 名稱打錯、未部署、或 CORS 設定不正確，都可能導致前端失敗。
+3. 如果前端改版後沒生效，請 Ctrl+F5 強制重新整理。

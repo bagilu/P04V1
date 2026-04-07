@@ -92,6 +92,10 @@
     );
   }
 
+  function createClient() {
+    return window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+  }
+
   function renderPlaceholder(listElement, text) {
     if (!listElement) return;
     listElement.innerHTML = `<li class="leaderboard-placeholder">${text}</li>`;
@@ -109,39 +113,6 @@
     }).join('');
   }
 
-  function buildRanking(rows, rolePrefix) {
-    const counter = new Map();
-    const latestNicknameByAccount = new Map();
-    const latestTimeByAccount = new Map();
-
-    rows.forEach((row) => {
-      const account = normalizeAccount(row[`${rolePrefix}_account`]);
-      const nickname = normalizeNickname(row[`${rolePrefix}_nickname`]);
-      const createdAt = row.created_at || '';
-      if (!account) return;
-
-      counter.set(account, (counter.get(account) || 0) + 1);
-
-      const existingTime = latestTimeByAccount.get(account) || '';
-      if (!existingTime || createdAt >= existingTime) {
-        latestTimeByAccount.set(account, createdAt);
-        latestNicknameByAccount.set(account, nickname || account);
-      }
-    });
-
-    return Array.from(counter.entries())
-      .map(([account, count]) => ({
-        account,
-        nickname: latestNicknameByAccount.get(account) || account,
-        count
-      }))
-      .sort((a, b) => {
-        if (b.count !== a.count) return b.count - a.count;
-        return a.account.localeCompare(b.account, 'zh-Hant');
-      })
-      .slice(0, 10);
-  }
-
   async function loadHomepageStats() {
     if (!ensureConfigAvailable()) {
       totalSmileCount.textContent = '--';
@@ -150,37 +121,22 @@
       return;
     }
 
-    const supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+    const supabase = createClient();
+    const { data, error } = await supabase.functions.invoke(config.FUNCTION_HOME_STATS, {
+      body: {}
+    });
 
-    const { count, error: countError } = await supabase
-      .from(config.TABLE_SMILE_EVENTS)
-      .select('*', { count: 'exact', head: true });
-
-    if (countError) {
-      console.error(countError);
+    if (error || !data?.success) {
+      console.error(error || data);
       totalSmileCount.textContent = '--';
       renderPlaceholder(smilerRankingList, '讀取失敗');
       renderPlaceholder(responderRankingList, '讀取失敗');
       return;
     }
 
-    totalSmileCount.textContent = count ?? 0;
-
-    const { data: rows, error: rowsError } = await supabase
-      .from(config.TABLE_SMILE_EVENTS)
-      .select('smiler_account, smiler_nickname, responder_account, responder_nickname, created_at')
-      .order('created_at', { ascending: false })
-      .limit(5000);
-
-    if (rowsError) {
-      console.error(rowsError);
-      renderPlaceholder(smilerRankingList, '讀取失敗');
-      renderPlaceholder(responderRankingList, '讀取失敗');
-      return;
-    }
-
-    renderRanking(smilerRankingList, buildRanking(rows || [], 'smiler'));
-    renderRanking(responderRankingList, buildRanking(rows || [], 'responder'));
+    totalSmileCount.textContent = data.totalSmileCount ?? 0;
+    renderRanking(smilerRankingList, data.smilerRanking || []);
+    renderRanking(responderRankingList, data.responderRanking || []);
   }
 
   saveAccountBtn?.addEventListener('click', () => {

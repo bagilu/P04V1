@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的 QRCode</title>
+  <title>我的 QRCode｜慈濟大學微笑漣漪系統</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
@@ -11,14 +11,18 @@
   <div class="page-shell narrow-shell">
     <main class="content-card centered-card">
       <h1 class="page-title">我的 QRCode</h1>
-      <p class="description">請讓對方掃描此 QRCode，以表達感謝或鼓勵。</p>
-      <div id="myNicknameDisplay" class="qr-nickname-display"></div>
-      <div id="myAccountDisplay" class="qr-account-display"></div>
-      <div id="myQrCodeBox" class="qr-box"></div>
+      <p class="description">請將此畫面出示給對方掃描。</p>
+
+      <div class="qr-profile-card">
+        <div id="myNicknameDisplay" class="qr-nickname-display"></div>
+        <div id="myAccountDisplay" class="qr-account-display"></div>
+      </div>
+
+      <div id="myQrCodeBox" class="my-qr-box"></div>
       <p id="myQrMessage" class="status-message"></p>
+
       <div class="action-row">
-        <button id="editAccountBtn" class="btn btn-secondary">修改資料</button>
-        <a href="index.html" class="btn btn-primary">回到主畫面</a>
+        <button id="editAccountBtn" class="btn btn-secondary">回主畫面</button>
       </div>
     </main>
   </div>

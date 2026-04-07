@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>紀錄查詢入口｜慈濟大學微笑漣漪系統</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="content-card">
+      <h1 class="page-title">紀錄查詢入口</h1>
+      <p class="description">此頁面未在主畫面公開顯示。請先輸入管理密碼，再選擇日期查詢當日紀錄。</p>
+
+      <section class="admin-query-grid">
+        <div>
+          <label for="adminCodeInput" class="field-label">管理密碼</label>
+          <input id="adminCodeInput" type="password" placeholder="請輸入只有管理者知道的密碼" autocomplete="off">
+        </div>
+        <div>
+          <label for="recordDateInput" class="field-label">日期</label>
+          <input id="recordDateInput" type="date">
+        </div>
+      </section>
+
+      <div class="action-row compact-row">
+        <button id="loadRecordsBtn" class="btn btn-primary">查詢紀錄</button>
+        <a href="index.html" class="btn btn-secondary">回主畫面</a>
+      </div>
+
+      <p id="adminMessage" class="status-message"></p>
+
+      <section class="records-card">
+        <div class="mini-label">查詢結果</div>
+        <div id="recordsSummary" class="records-summary">尚未查詢</div>
+        <div class="records-table-wrap">
+          <table class="records-table">
+            <thead>
+              <tr>
+                <th>建立時間</th>
+                <th>日期</th>
+                <th>微笑者帳號</th>
+                <th>微笑者暱稱</th>
+                <th>回應者帳號</th>
+                <th>回應者暱稱</th>
+                <th>類型</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+              <tr><td colspan="7" class="table-placeholder">尚未查詢資料</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="hidden_records_console.js"></script>
+</body>
+</html>

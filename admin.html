@@ -3,61 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理者紀錄查詢</title>
+  <title>此頁面未開放｜慈濟大學微笑漣漪系統</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="page-shell narrow-shell">
-    <main class="content-card">
-      <h1 class="page-title">管理者紀錄查詢</h1>
-      <p class="description">選擇日期後，顯示該日期所有微笑紀錄。此頁面目前以帳號白名單作為前端限制，正式上線建議再搭配 RLS 或 Edge Function。</p>
-
-      <section class="admin-filter-card">
-        <label for="queryDateInput" class="field-label">查詢日期</label>
-        <div class="admin-filter-row">
-          <input id="queryDateInput" type="date">
-          <button id="loadRecordsBtn" class="btn btn-primary">查詢紀錄</button>
-        </div>
-      </section>
-
-      <p id="adminStatusMessage" class="status-message"></p>
-
-      <section class="stats-strip admin-stats-strip">
-        <div class="stats-card">
-          <div class="stats-label">當日紀錄總數</div>
-          <div class="stats-value"><span id="dailyCount">0</span><span class="stats-unit">筆</span></div>
-        </div>
-      </section>
-
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>送出者帳號</th>
-              <th>送出者暱稱</th>
-              <th>被感謝者帳號</th>
-              <th>被感謝者暱稱</th>
-              <th>類型</th>
-              <th>日期</th>
-            </tr>
-          </thead>
-          <tbody id="recordsTableBody">
-            <tr>
-              <td colspan="7" class="table-placeholder">尚未查詢資料</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+    <main class="content-card centered-card">
+      <h1 class="page-title">此頁面未公開使用</h1>
+      <p class="description">本頁面不提供公開查詢入口。</p>
       <div class="action-row">
-        <a href="index.html" class="btn btn-secondary">回到主畫面</a>
+        <a href="index.html" class="btn btn-primary">回主畫面</a>
       </div>
     </main>
   </div>
-
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
 </body>
 </html>

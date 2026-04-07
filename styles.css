@@ -351,68 +351,143 @@ input[type="text"] {
   .hero-title-en { font-size: 1.05rem; }
 }
 
-.admin-entry-row {
-  margin: 6px 0 18px;
-  text-align: right;
+
+.hidden { display: none !important; }
+.status-message { min-height: 24px; margin-top: 14px; font-weight: 700; }
+.status-message.warn { color: var(--warn); }
+.status-message.error { color: var(--error); }
+.status-message.success { color: var(--success); }
+.stats-strip { margin: 18px 0; }
+.stats-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: #fafcff;
 }
-.admin-entry-link {
+.stats-label { color: var(--sub); font-weight: 700; }
+.stats-value { font-size: 2rem; font-weight: 800; margin-top: 6px; }
+.stats-unit { font-size: 1rem; margin-left: 6px; color: var(--sub); }
+.leaderboard-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.leaderboard-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+}
+.leaderboard-card h3 { margin-top: 0; }
+.leaderboard-card-primary-light {
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-border);
+}
+.leaderboard-card-accent-light {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft-border);
+}
+.leaderboard-list { margin: 0; padding-left: 22px; }
+.leaderboard-list li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+.rank-order { width: 28px; font-weight: 800; }
+.rank-name { flex: 1; font-weight: 700; }
+.rank-count { color: var(--sub); }
+.leaderboard-placeholder { color: var(--sub); }
+.my-qr-box {
+  width: 240px;
+  min-height: 240px;
+  margin: 18px auto 10px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  background: #fff;
+}
+.qr-profile-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fafcff;
+  margin-top: 18px;
+}
+.scanner-box {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 280px;
+}
+.scan-result-block {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fafcff;
+}
+.target-account-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin: 6px 0 0;
+}
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+.admin-link-row { margin-top: 16px; text-align: center; }
+.text-link {
   color: var(--primary-dark);
   font-weight: 700;
 }
-.admin-entry-link:hover {
-  text-decoration: underline;
+.admin-query-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
-.admin-filter-card {
-  margin-top: 18px;
-  padding: 18px;
+.records-card {
+  margin-top: 20px;
   border: 1px solid var(--line);
   border-radius: 16px;
+  padding: 16px;
   background: #fafcff;
 }
-.admin-filter-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-input[type="date"] {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 1rem;
-}
-.admin-stats-strip {
-  margin-top: 18px;
-}
-.admin-table-wrap {
-  margin-top: 18px;
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-}
-.admin-table {
+.records-summary { margin: 10px 0 14px; font-weight: 700; }
+.records-table-wrap { overflow-x: auto; }
+.records-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  min-width: 900px;
 }
-.admin-table th,
-.admin-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--line);
+.records-table th,
+.records-table td {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
   text-align: left;
   vertical-align: top;
+  font-size: 0.95rem;
 }
-.admin-table th {
-  background: #f3f7ff;
-  font-weight: 800;
-}
-.table-placeholder {
-  text-align: center !important;
-  color: var(--sub);
-}
-@media (max-width: 720px) {
-  .admin-entry-row {
-    text-align: left;
+.records-table th { background: #f2f6fd; }
+.table-placeholder { text-align: center !important; color: var(--sub); }
+
+@media (max-width: 800px) {
+  .hero-card,
+  .leaderboard-section,
+  .admin-query-grid,
+  .feedback-grid,
+  .main-actions {
+    grid-template-columns: 1fr;
+  }
+  .current-account-card {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

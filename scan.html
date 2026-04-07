@@ -3,32 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>掃描他人 QRCode</title>
+  <title>掃描他人 QRCode｜慈濟大學微笑漣漪系統</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="page-shell narrow-shell">
-    <main class="content-card centered-card">
+    <main class="content-card">
       <h1 class="page-title">掃描他人 QRCode</h1>
-      <p id="scannerNotice" class="status-message"></p>
-      <div id="reader" class="reader-box"></div>
-      <p id="scanStatusMessage" class="status-message"></p>
+      <p id="scannerNotice" class="status-message warn">正在準備相機與帳號資料…</p>
+
+      <div id="reader" class="scanner-box"></div>
 
       <section id="scanResultBlock" class="scan-result-block hidden">
-        <h2>掃描結果</h2>
-        <p>對象帳號：<strong id="targetAccountText"></strong><span class="inline-domain">@gms.tcu.edu.tw</span></p>
+        <div class="mini-label">已掃描到帳號</div>
+        <div id="targetAccountText" class="target-account-text"></div>
+
         <div class="feedback-grid">
-          <button class="btn btn-feedback feedback-btn" data-type="溫馨笑容">溫馨笑容</button>
-          <button class="btn btn-feedback feedback-btn" data-type="親切態度">親切態度</button>
-          <button class="btn btn-feedback feedback-btn" data-type="其他感謝或鼓勵">其他感謝或鼓勵</button>
+          <button class="btn btn-feedback feedback-btn" data-type="1">他對我微笑</button>
+          <button class="btn btn-feedback feedback-btn" data-type="2">他和我打招呼</button>
+          <button class="btn btn-feedback feedback-btn" data-type="3">他鼓勵我</button>
+          <button class="btn btn-feedback feedback-btn" data-type="4">他幫助我</button>
         </div>
       </section>
 
+      <p id="scanStatusMessage" class="status-message"></p>
+
       <div class="action-row">
         <button id="restartScanBtn" class="btn btn-secondary hidden">重新掃描</button>
-        <a href="index.html" class="btn btn-primary">回到主畫面</a>
+        <a href="index.html" class="btn btn-secondary">回主畫面</a>
       </div>
     </main>
   </div>
