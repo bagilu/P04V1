@@ -1,0 +1,13 @@
+project_id = "YOUR_PROJECT_REF"
+
+[functions.P04_get_home_stats]
+verify_jwt = false
+
+[functions.P04_submit_smile_event]
+verify_jwt = false
+
+[functions.P04_get_records_by_date]
+verify_jwt = false
+
+[functions.P04_get_recent_notifications]
+verify_jwt = false

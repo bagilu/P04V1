@@ -95,6 +95,38 @@
     return window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
   }
 
+
+  function getFunctionUrl(key) {
+    return config.FUNCTIONS && config.FUNCTIONS[key];
+  }
+
+  async function invokeP04Function(key, body = {}, extraHeaders = {}) {
+    const url = getFunctionUrl(key);
+    if (!url || url.includes('YOUR-PROJECT')) {
+      return { data: null, error: { message: '請先在 config.js 填入正確的 Function URL。' } };
+    }
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': config.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${config.SUPABASE_ANON_KEY}`,
+          ...extraHeaders
+        },
+        body: JSON.stringify(body || {})
+      });
+      let data = null;
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok) {
+        return { data, error: { message: data?.message || `Edge Function returned ${response.status}` } };
+      }
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: { message: error?.message || 'Function 呼叫失敗。' } };
+    }
+  }
+
   async function stopScanner() {
     if (html5QrCode && isScannerRunning) {
       try {
@@ -169,14 +201,11 @@
     feedbackButtons.forEach(btn => btn.disabled = true);
     setMessage(scanStatusMessage, '資料送出中，請稍候。', 'warn');
 
-    const supabase = createClient();
-    const { data, error } = await supabase.functions.invoke(config.FUNCTION_SUBMIT_EVENT, {
-      body: {
-        smiler_account: smilerAccount,
-        responder_account: responderAccount,
-        responder_nickname: responderNickname,
-        smile_type: Number(smileType)
-      }
+    const { data, error } = await invokeP04Function('SUBMIT_SMILE_EVENT', {
+      smiler_account: smilerAccount,
+      responder_account: responderAccount,
+      responder_nickname: responderNickname,
+      smile_type: Number(smileType)
     });
 
     if (error || !data?.success) {
