@@ -6,12 +6,13 @@
   <title>我的 QRCode｜慈濟大學微笑漣漪系統</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="page-shell narrow-shell">
-    <main class="content-card centered-card">
+    <main class="content-card centered-card compact-card">
       <h1 class="page-title">我的 QRCode</h1>
-      <p class="description">請將此畫面出示給對方掃描。</p>
+      <p class="description tight-text">請將此畫面出示給對方掃描。</p>
 
       <div class="qr-profile-card">
         <div id="myNicknameDisplay" class="qr-nickname-display"></div>
@@ -20,6 +21,11 @@
 
       <div id="myQrCodeBox" class="my-qr-box"></div>
       <p id="myQrMessage" class="status-message"></p>
+
+      <section id="liveNoticePanel" class="live-notice-panel hidden" aria-live="polite">
+        <div class="live-notice-title">剛剛收到的紀錄</div>
+        <div id="liveNoticeText" class="live-notice-text"></div>
+      </section>
 
       <div class="action-row">
         <button id="editAccountBtn" class="btn btn-secondary">回主畫面</button>
