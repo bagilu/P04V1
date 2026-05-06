@@ -20,26 +20,8 @@ function normalizeAccount(value: unknown): string {
   return String(value ?? "").trim().toLowerCase();
 }
 
-function normalizeNickname(value: unknown): string {
-  return String(value ?? "").trim();
-}
-
 function isValidAccount(value: string): boolean {
   return /^[a-zA-Z0-9._%+-]+$/.test(normalizeAccount(value));
-}
-
-function isValidNickname(value: string, maxLength = 20): boolean {
-  const nickname = normalizeNickname(value);
-  return nickname.length > 0 && nickname.length <= maxLength;
-}
-
-function todayTaipeiDate(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Taipei",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
 }
 
 function getServiceClient() {
@@ -70,31 +52,39 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const smilerAccount = normalizeAccount(body?.smiler_account);
-    const since = String(body?.since ?? "").trim();
+    const afterIdRaw = String(body?.after_id ?? "").trim();
+    const limitRaw = Number(body?.limit ?? 5);
+    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.floor(limitRaw), 1), 10) : 5;
+
     if (!isValidAccount(smilerAccount)) {
       return jsonResponse({ success: false, code: "INVALID_INPUT", message: "帳號格式不正確。" }, 400);
     }
 
     const supabase = getServiceClient();
+
     let query = supabase
       .from(TABLE_SMILE_EVENTS)
-      .select("created_at, responder_account, responder_nickname, smile_type")
+      .select("id, created_at, responder_account, responder_nickname, smile_type")
       .eq("smiler_account", smilerAccount)
-      .order("created_at", { ascending: false })
-      .limit(5);
+      .order("id", { ascending: false })
+      .limit(limit);
 
-    if (since) query = query.gt("created_at", since);
+    if (afterIdRaw && /^\d+$/.test(afterIdRaw)) {
+      query = query.gt("id", Number(afterIdRaw));
+    }
 
     const { data, error } = await query;
     if (error) return jsonResponse({ success: false, code: error.code, message: error.message }, 500);
 
     const rows = (data ?? []).map((row: any) => ({
+      id: row.id,
       created_at: row.created_at,
       responder_account: row.responder_account,
       responder_nickname: row.responder_nickname || row.responder_account,
       smile_type: row.smile_type,
       smile_type_label: smileTypeLabel(row.smile_type),
     }));
+
     return jsonResponse({ success: true, rows });
   } catch (error) {
     return jsonResponse({ success: false, message: error instanceof Error ? error.message : "Unknown error" }, 500);

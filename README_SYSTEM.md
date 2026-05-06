@@ -88,3 +88,14 @@ sql_setup.sql
 3. Secrets 是否已設定 `SUPABASE_SERVICE_ROLE_KEY`。
 4. SQL 是否已執行，尤其是 `smiler_nickname`、`responder_nickname`、`event_date` 欄位。
 5. Function Logs 中若出現 relation not found，通常是資料表名稱大小寫不一致；本版已統一使用 `tblp04smileevents`。
+
+
+## P04 V2.3 更新紀錄：花束通知
+
+- 被掃描者停留在 QRCode 頁面時，系統會每 3 秒透過 `P04_get_recent_notifications` 查詢是否有新紀錄。
+- 若有新紀錄，QRCode 區域會暫時切換成花束通知卡。
+- 通知文字來源為最新一筆 `tblp04smileevents`，以 `smiler_account` 判斷被掃描者，以 `responder_nickname` 顯示掃描者。
+- 本版使用 `id` 作為通知遞增判斷，避免以時間比較造成漏接。
+- Function 與資料表均維持 P04 命名與小寫資料表名稱：
+  - Function: `P04_get_recent_notifications`
+  - Table: `tblp04smileevents`

@@ -1,178 +1,109 @@
-# P04 微笑漣漪系統 V2.2 部署步驟
+# P04 V2.3 花束通知版部署步驟
 
-本版是「小寫資料表修正版」，已依照目前 Supabase 實際資料表名稱調整：
+本版目的：
+當「掃描者」掃描並送出紀錄後，「被掃描者」停留在自己的 QRCode 畫面時，QRCode 區域會暫時顯示一張花束通知卡，例如：
 
-- `public.tblp04smileevents`
-- `public.tblp04maillog`
+> 剛剛 XXX 記錄了你對他的問候  
+> 謝謝你把善意傳出去
 
-請依照以下順序更新。
+數秒後 QRCode 會自動恢復。
 
 ---
 
 ## 1. 先執行 SQL
 
-到 Supabase：
+Supabase Dashboard → SQL Editor → New Query
 
-`SQL Editor → New Query`
+執行：
 
-打開 ZIP 內的：
+```sql
+-- P04 V2.3：通知查詢加速索引，不刪除、不覆蓋既有資料
+CREATE INDEX IF NOT EXISTS idx_p04_smiler_id_desc
+ON public.tblp04smileevents(smiler_account, id DESC);
+```
 
-`sql_setup.sql`
-
-全部貼上並執行。
-
-這份 SQL 是非破壞性更新：
-
-- 不刪除舊資料
-- 不清空資料表
-- 只補欄位、補索引、補空白日期
+若您已經執行完整 `sql_setup.sql`，也可以直接執行 ZIP 內完整版本。
 
 ---
 
-## 2. 更新 Edge Functions
+## 2. 更新 Edge Function
 
-到 Supabase：
-
-`Edge Functions → Deploy New Function`
-
-如果同名 Function 已存在，請進入該 Function 後更新 `index.ts` 內容再 Deploy。
-
-請逐一更新以下四支：
-
-### A. P04_submit_smile_event
-
-貼上：
-
-`supabase/functions/P04_submit_smile_event/index.ts`
-
-用途：掃描者送出微笑／問候／鼓勵／幫助紀錄。
-
-### B. P04_get_home_stats
-
-貼上：
-
-`supabase/functions/P04_get_home_stats/index.ts`
-
-用途：首頁統計、微笑王、回應王排行榜。
-
-### C. P04_get_records_by_date
-
-貼上：
-
-`supabase/functions/P04_get_records_by_date/index.ts`
-
-用途：隱藏管理頁依日期查詢紀錄。
-
-### D. P04_get_recent_notifications
-
-貼上：
-
-`supabase/functions/P04_get_recent_notifications/index.ts`
-
-用途：QRCode 頁面輪詢最新通知，顯示「某某人剛剛送出紀錄」。
-
----
-
-## 3. 確認 Edge Function Secrets
-
-到 Supabase：
-
-`Edge Functions → Secrets`
-
-至少需要：
+這一版主要必須更新：
 
 ```text
-SUPABASE_SERVICE_ROLE_KEY
-ADMIN_ACCESS_CODE
+P04_get_recent_notifications
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` 請使用 Project Settings → API 裡的 service_role key，不是 anon key。
+Supabase Dashboard → Edge Functions → P04_get_recent_notifications → Edit / Update Function
 
----
-
-## 4. 修改 config.js
-
-請依照 `config.example.js` 修改正式 `config.js`。
-
-至少要確認：
-
-```javascript
-FUNCTIONS: {
-  SUBMIT_SMILE_EVENT: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_submit_smile_event',
-  GET_HOME_STATS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_home_stats',
-  GET_RECORDS_BY_DATE: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_records_by_date',
-  GET_RECENT_NOTIFICATIONS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_recent_notifications'
-}
-```
-
-若 GitHub Pages 網址不同，也請修改：
-
-```javascript
-SITE_URL: 'https://你的帳號.github.io/你的repo/'
-```
-
----
-
-## 5. 覆蓋 GitHub Pages 檔案
-
-將 ZIP 內前端檔案覆蓋到 GitHub repository。
-
-常見需要覆蓋：
+將以下檔案完整貼上：
 
 ```text
-index.html
-myqrcode.html
-scan.html
-hidden-records-portal.html
-app.js
+supabase/functions/P04_get_recent_notifications/index.ts
+```
+
+然後 Deploy。
+
+其他 Function 若已經是 V2.2 且正常運作，可以不用重貼。
+
+---
+
+## 3. 更新 config.js
+
+確認 `config.js` 有以下設定：
+
+```javascript
+NOTIFICATION_POLL_MS: 3000,
+NOTIFICATION_DISPLAY_MS: 8000,
+```
+
+並確認 Function URL：
+
+```javascript
+GET_RECENT_NOTIFICATIONS:
+  "https://您的PROJECT_REF.supabase.co/functions/v1/P04_get_recent_notifications"
+```
+
+---
+
+## 4. 覆蓋 GitHub Pages 前端
+
+請覆蓋這些前端檔案：
+
+```text
 myqrcode.js
-scan.js
-hidden_records_console.js
 styles.css
 config.js
 ```
 
-然後 commit / push。
+若您習慣整包覆蓋，也可以覆蓋全部前端檔案。
 
 ---
 
-## 6. 測試順序
+## 5. 測試方式
 
-### A. 首頁測試
-
-打開首頁，確認：
-
-- 統計數字正常
-- 排行榜正常
-- Console 沒有紅色錯誤
-
-### B. QRCode 測試
-
-用 A 掃 B 的 QRCode，送出一筆紀錄。
-
-成功時不應再出現：
-
-```text
-Edge Function returned a non-2xx status code
-```
-
-### C. 通知測試
-
-回到 B 的 QRCode 頁面，應能看到類似：
-
-```text
-某某人剛剛送出紀錄，謝謝你的微笑。
-```
+1. A 使用者打開自己的 QRCode 頁面，不要離開。
+2. B 使用者掃描 A 的 QRCode。
+3. B 送出「微笑 / 問候 / 鼓勵 / 幫助」。
+4. A 的 QRCode 區域應在約 3 秒內變成花束訊息卡。
+5. 約 8 秒後，A 的 QRCode 自動恢復。
 
 ---
 
-## 7. 若仍有錯誤
+## 6. 若沒有出現通知
 
-請優先檢查：
+請依序檢查：
 
-1. Function 裡是否都使用 `tblp04smileevents`
-2. `config.js` 的 Function URL 是否正確
-3. `SUPABASE_SERVICE_ROLE_KEY` 是否已設定
-4. Function Logs 內的錯誤訊息
+1. `P04_get_recent_notifications` 是否已重新 Deploy。
+2. `config.js` 的 `GET_RECENT_NOTIFICATIONS` URL 是否正確。
+3. A 是否停留在 `myqrcode.html`。
+4. 瀏覽器是否有快取舊版 `myqrcode.js`，可按 Ctrl + F5 強制重新整理。
+5. Supabase Edge Function Logs 是否有錯誤訊息。
 
-本版已修正 v2.1 的主要錯誤：舊版使用 `TblP04SmileEvents`，但您的 Supabase 實際資料表是全小寫 `tblp04smileevents`。
+---
+
+## 7. 本版不會做的事
+
+本版不會刪除任何舊資料。  
+本版不會改變既有打卡/送出紀錄邏輯。  
+本版只強化「被掃描者端收到通知」的前端顯示與通知查詢 Function。

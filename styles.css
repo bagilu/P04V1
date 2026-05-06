@@ -303,3 +303,70 @@ input {
   .account-input-wrap { flex-direction: column; align-items: stretch; gap: 4px; }
   .fixed-domain { padding-left: 4px; }
 }
+
+
+/* P04 V2.3: 被掃描者端花束通知 */
+.qr-flower-mode {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flower-notice-card {
+  width: min(92vw, 330px);
+  min-height: 210px;
+  padding: 18px 16px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fff8e8 0%, #ffffff 100%);
+  border: 1px solid rgba(220, 160, 82, 0.35);
+  box-shadow: 0 14px 34px rgba(120, 78, 32, 0.16);
+  text-align: center;
+  animation: p04FlowerIn 480ms ease-out both;
+}
+
+.flower-emoji {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 5px 8px rgba(150, 90, 40, 0.18));
+}
+
+.flower-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #7a4b1e;
+  margin-bottom: 8px;
+}
+
+.flower-message {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #3e3329;
+}
+
+.flower-message strong {
+  color: #a94b36;
+  font-weight: 900;
+}
+
+.flower-subtitle {
+  margin-top: 10px;
+  font-size: 0.88rem;
+  color: #7a6a58;
+}
+
+@keyframes p04FlowerIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

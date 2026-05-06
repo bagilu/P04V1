@@ -36,3 +36,8 @@ create index if not exists idx_p04_smileevents_responder_created_at
 alter table if exists public.tblp04smileevents enable row level security;
 
 notify pgrst, 'reload schema';
+
+
+-- P04 V2.3：通知查詢加速索引，不刪除、不覆蓋既有資料
+CREATE INDEX IF NOT EXISTS idx_p04_smiler_id_desc
+ON public.tblp04smileevents(smiler_account, id DESC);
