@@ -13,6 +13,7 @@ window.APP_CONFIG = {
     SUBMIT_SMILE_EVENT: 'https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P04_submit_smile_event',
     GET_HOME_STATS: 'https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P04_get_home_stats',
     GET_RECORDS_BY_DATE: 'https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P04_get_records_by_date',
+    GET_MY_RECORDS: 'https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P04_get_my_records',
     GET_RECENT_NOTIFICATIONS: 'https://mfljkyvdadxlrbxlboce.supabase.co/functions/v1/P04_get_recent_notifications'
   },
 
