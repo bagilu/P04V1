@@ -8,9 +8,8 @@
   const liveNoticePanel = document.getElementById('liveNoticePanel');
   const liveNoticeText = document.getElementById('liveNoticeText');
 
+  let lastCheckedAt = new Date().toISOString();
   let pollTimer = null;
-  let qrRestoreTimer = null;
-  let latestKnownEventId = null;
 
   function normalizeAccount(value) {
     return (value || '').trim().toLowerCase();
@@ -41,6 +40,11 @@
       !config.SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY')
     );
   }
+
+  function createClient() {
+    return window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+  }
+
 
   function getFunctionUrl(key) {
     return config.FUNCTIONS && config.FUNCTIONS[key];
@@ -79,113 +83,26 @@
     if (type) myQrMessage.classList.add(type);
   }
 
-  function renderQrCode(account) {
-    if (!myQrCodeBox) return;
-    myQrCodeBox.innerHTML = '';
-    new QRCode(myQrCodeBox, {
-      text: accountToEmail(account),
-      width: 190,
-      height: 190,
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }
-
-  function buildFlowerNotice(row) {
-    const name = row.responder_nickname || row.responder_account || '某位同學';
-    const label = row.smile_type_label || '善意';
-    return `
-      <div class="flower-notice-card" role="status" aria-live="polite">
-        <div class="flower-emoji">💐</div>
-        <div class="flower-title">收到一束微笑之花</div>
-        <div class="flower-message">
-          剛剛 <strong>${escapeHtml(name)}</strong><br>
-          記錄了你對他的${escapeHtml(label)}
-        </div>
-        <div class="flower-subtitle">謝謝你把善意傳出去</div>
-      </div>
-    `;
-  }
-
-  function escapeHtml(value) {
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
-  }
-
-  function showLiveNotice(row, account) {
+  function showLiveNotice(row) {
     if (!row) return;
-
     const name = row.responder_nickname || row.responder_account || '某位同學';
     const label = row.smile_type_label || '善意';
-
-    if (liveNoticeText && liveNoticePanel) {
-      liveNoticeText.textContent = `剛剛 ${name} 記錄了你對他的${label}。`;
-      liveNoticePanel.classList.remove('hidden');
-      liveNoticePanel.classList.remove('notice-pop');
-      void liveNoticePanel.offsetWidth;
-      liveNoticePanel.classList.add('notice-pop');
-    }
-
-    if (myQrCodeBox) {
-      myQrCodeBox.classList.add('qr-flower-mode');
-      myQrCodeBox.innerHTML = buildFlowerNotice(row);
-    }
-
-    setMessage('新的微笑漣漪已送達。QRCode 稍後會自動回來。', 'success');
-
-    if (qrRestoreTimer) clearTimeout(qrRestoreTimer);
-    qrRestoreTimer = setTimeout(() => {
-      myQrCodeBox.classList.remove('qr-flower-mode');
-      renderQrCode(account);
-      setMessage('此 QRCode 內容為完整校園 Email；掃描後系統會自動轉換為帳號。', 'success');
-    }, config.NOTIFICATION_DISPLAY_MS || 8000);
-  }
-
-  function getSeenKey(account) {
-    return `P04_LAST_SEEN_EVENT_ID_${normalizeAccount(account)}`;
-  }
-
-  function loadSeenEventId(account) {
-    return localStorage.getItem(getSeenKey(account)) || null;
-  }
-
-  function saveSeenEventId(account, id) {
-    if (id !== undefined && id !== null) {
-      localStorage.setItem(getSeenKey(account), String(id));
-    }
-  }
-
-  async function initializeLatestEvent(account) {
-    const { data, error } = await invokeP04Function('GET_RECENT_NOTIFICATIONS', {
-      smiler_account: account,
-      limit: 1
-    });
-
-    if (error || !data?.success) {
-      console.warn(error || data);
-      return;
-    }
-
-    const rows = data.rows || [];
-    if (rows.length && rows[0].id !== undefined && rows[0].id !== null) {
-      latestKnownEventId = String(rows[0].id);
-      saveSeenEventId(account, latestKnownEventId);
-    }
+    liveNoticeText.textContent = `${name} 剛剛送出紀錄。謝謝你的${label}。`;
+    liveNoticePanel.classList.remove('hidden');
+    liveNoticePanel.classList.remove('notice-pop');
+    void liveNoticePanel.offsetWidth;
+    liveNoticePanel.classList.add('notice-pop');
   }
 
   async function pollRecentNotifications(account) {
     if (!ensureConfigAvailable()) return;
 
-    const lastSeenId = latestKnownEventId || loadSeenEventId(account);
-
-    const { data, error } = await invokeP04Function('GET_RECENT_NOTIFICATIONS', {
+    const { data, error } = await invokeP04Function('GET_RECENT_NOTICE', {
       smiler_account: account,
-      after_id: lastSeenId,
-      limit: 3
+      since: lastCheckedAt
     });
+
+    const now = new Date().toISOString();
 
     if (error || !data?.success) {
       console.warn(error || data);
@@ -193,15 +110,10 @@
     }
 
     const rows = data.rows || [];
-    if (!rows.length) return;
-
-    const newest = rows[0];
-    if (newest.id !== undefined && newest.id !== null) {
-      latestKnownEventId = String(newest.id);
-      saveSeenEventId(account, latestKnownEventId);
+    if (rows.length) {
+      showLiveNotice(rows[0]);
+      lastCheckedAt = rows[0].created_at || now;
     }
-
-    showLiveNotice(newest, account);
   }
 
   const account = normalizeAccount(localStorage.getItem(config.STORAGE_KEY_ACCOUNT));
@@ -213,20 +125,17 @@
     myNicknameDisplay.textContent = nickname;
     myAccountDisplay.textContent = accountToEmail(account);
 
-    renderQrCode(account);
+    new QRCode(myQrCodeBox, {
+      text: accountToEmail(account),
+      width: 190,
+      height: 190,
+      correctLevel: QRCode.CorrectLevel.M
+    });
 
     setMessage('此 QRCode 內容為完整校園 Email；掃描後系統會自動轉換為帳號。', 'success');
 
     if (ensureConfigAvailable()) {
-      latestKnownEventId = loadSeenEventId(account);
-      if (!latestKnownEventId) {
-        initializeLatestEvent(account).then(() => {
-          pollTimer = setInterval(() => pollRecentNotifications(account), config.NOTIFICATION_POLL_MS || 3000);
-        });
-      } else {
-        pollTimer = setInterval(() => pollRecentNotifications(account), config.NOTIFICATION_POLL_MS || 3000);
-      }
-
+      pollTimer = setInterval(() => pollRecentNotifications(account), config.NOTIFICATION_POLL_MS || 5000);
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) pollRecentNotifications(account);
       });
@@ -235,7 +144,6 @@
 
   editAccountBtn?.addEventListener('click', () => {
     if (pollTimer) clearInterval(pollTimer);
-    if (qrRestoreTimer) clearTimeout(qrRestoreTimer);
     window.location.href = 'index.html';
   });
 })();

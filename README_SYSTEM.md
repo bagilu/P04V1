@@ -1,101 +1,52 @@
-# P04 V2.2 小寫資料表修正版
+# P04 微笑漣漪系統 V2.8 完整版
 
-重要：本版已依照目前 Supabase 實際資料表名稱修正為 `tblp04smileevents` 與 `tblp04maillog`。請先閱讀 `DEPLOY_STEPS.md`。
+## 版本定位
 
-# P04 微笑漣漪系統 v2.1
+本版為完整整合版，不是補丁包。
 
-本版修正重點：
+## 視覺風格
 
-1. Function 採用老師熟悉的 Supabase Dashboard 建立方式。
-2. 每支 Function 都有獨立資料夾與完整 `index.ts`，不依賴 `_shared`。
-3. Function 名稱全部以 `P04_` 開頭。
-4. 前端 `config.js` 改為直接填入 Function URL。
-5. 資料表名稱統一使用目前正式表名：`tblp04smileevents`。
-6. SQL 為非破壞性，不會清空舊資料。
+- 80% 遊戲化教育風：活潑色彩、成就感、友善卡片、表格徽章。
+- 20% Apple 專業風：清晰字體、留白、玻璃感卡片、低雜訊排版。
 
----
+## Function 命名
 
-## 一、需要建立的 Edge Functions
-
-請到 Supabase Dashboard：
-
-`Edge Functions` → `Deploy New Function`
-
-逐一建立以下 Function，並貼上對應資料夾中的 `index.ts`。
-
-| Function 名稱 | 來源檔案 | 功能 |
-|---|---|---|
-| `P04_submit_smile_event` | `supabase/functions/P04_submit_smile_event/index.ts` | 掃描者送出微笑／問候／鼓勵／幫助紀錄 |
-| `P04_get_home_stats` | `supabase/functions/P04_get_home_stats/index.ts` | 首頁總數與排行榜 |
-| `P04_get_records_by_date` | `supabase/functions/P04_get_records_by_date/index.ts` | 隱藏管理頁依日期查詢紀錄 |
-| `P04_get_recent_notifications` | `supabase/functions/P04_get_recent_notifications/index.ts` | 被掃描者 QRCode 頁面顯示即時通知 |
-
----
-
-## 二、必須設定 Secrets
-
-Supabase Dashboard → Project Settings → Edge Functions / Secrets
-
-至少需要：
+所有 Edge Function 均使用 `P04_` 開頭：
 
 ```text
-SUPABASE_SERVICE_ROLE_KEY=你的 service_role key
-ADMIN_ACCESS_CODE=你的後台管理碼
+P04_submit_smile_event
+P04_get_home_stats
+P04_get_records_by_date
+P04_get_recent_notice
+P04_get_my_records
 ```
 
-其中 `SUPABASE_SERVICE_ROLE_KEY` 不可以放在前端，只能放在 Edge Function Secrets。
+## 資料表
 
----
-
-## 三、config.js 修改方式
-
-請將 `YOUR-PROJECT` 改成您的 Supabase Project Ref，並填入 anon key。
-
-```javascript
-window.APP_CONFIG = {
-  SUPABASE_URL: 'https://YOUR-PROJECT.supabase.co',
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',
-
-  FUNCTIONS: {
-    SUBMIT_SMILE_EVENT: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_submit_smile_event',
-    GET_HOME_STATS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_home_stats',
-    GET_RECORDS_BY_DATE: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_records_by_date',
-    GET_RECENT_NOTIFICATIONS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_recent_notifications'
-  }
-};
-```
-
----
-
-## 四、SQL
-
-請在 Supabase SQL Editor 執行：
+使用既有小寫資料表：
 
 ```text
-sql_setup.sql
+tblp04smileevents
+tblp04maillog
 ```
 
-這份 SQL 只會補欄位與索引，不會刪除資料。
+## 新增功能
 
----
+主畫面排行榜下方直接內建：
 
-## 五、若出現 Edge Function returned a non-2xx status code
+1. 我的微笑紀錄
+2. 我的回應紀錄
 
-請依序檢查：
+每頁 10 筆，以 `created_at DESC` 排序。
 
-1. `config.js` 的 Function URL 是否正確。
-2. Function 名稱是否完全一致，例如 `P04_submit_smile_event`。
-3. Secrets 是否已設定 `SUPABASE_SERVICE_ROLE_KEY`。
-4. SQL 是否已執行，尤其是 `smiler_nickname`、`responder_nickname`、`event_date` 欄位。
-5. Function Logs 中若出現 relation not found，通常是資料表名稱大小寫不一致；本版已統一使用 `tblp04smileevents`。
+## ZIP 規則
 
+ZIP 最外層包含同名資料夾：
 
-## P04 V2.3 更新紀錄：花束通知
+```text
+P04V2_8_full_gamified_apple_my_records/
+```
 
-- 被掃描者停留在 QRCode 頁面時，系統會每 3 秒透過 `P04_get_recent_notifications` 查詢是否有新紀錄。
-- 若有新紀錄，QRCode 區域會暫時切換成花束通知卡。
-- 通知文字來源為最新一筆 `tblp04smileevents`，以 `smiler_account` 判斷被掃描者，以 `responder_nickname` 顯示掃描者。
-- 本版使用 `id` 作為通知遞增判斷，避免以時間比較造成漏接。
-- Function 與資料表均維持 P04 命名與小寫資料表名稱：
-  - Function: `P04_get_recent_notifications`
-  - Table: `tblp04smileevents`
+## 非破壞性原則
+
+`sql_setup.sql` 不會刪除既有資料，只補欄位與索引。

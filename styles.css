@@ -305,125 +305,238 @@ input {
 }
 
 
-/* P04 V2.3: 被掃描者端花束通知 */
-.qr-flower-mode {
-  min-height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* =========================================================
+   P04 V2.8 Theme: 遊戲化教育風 80% + Apple 專業風 20%
+   ========================================================= */
+:root {
+  --p04-blue: #2f80ed;
+  --p04-sky: #56ccf2;
+  --p04-yellow: #ffd166;
+  --p04-orange: #ff8a3d;
+  --p04-green: #2fbf71;
+  --p04-ink: #1f2937;
+  --p04-muted: #6b7280;
+  --p04-card: rgba(255, 255, 255, 0.86);
+  --p04-line: rgba(31, 41, 55, 0.10);
 }
 
-.flower-notice-card {
-  width: min(92vw, 330px);
-  min-height: 210px;
-  padding: 18px 16px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, #fff8e8 0%, #ffffff 100%);
-  border: 1px solid rgba(220, 160, 82, 0.35);
-  box-shadow: 0 14px 34px rgba(120, 78, 32, 0.16);
-  text-align: center;
-  animation: p04FlowerIn 480ms ease-out both;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 209, 102, 0.34), transparent 30%),
+    radial-gradient(circle at 90% 18%, rgba(86, 204, 242, 0.26), transparent 34%),
+    linear-gradient(180deg, #f1f8ff 0%, #fff8ea 100%);
+  color: var(--p04-ink);
 }
 
-.flower-emoji {
-  font-size: 56px;
-  line-height: 1;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 5px 8px rgba(150, 90, 40, 0.18));
+.page-shell { max-width: 1080px; }
+
+.hero-card, .content-card, .leaderboard-card, .current-account-card, .record-panel {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.72);
+  box-shadow: 0 18px 42px rgba(45, 64, 90, 0.13);
 }
 
-.flower-title {
-  font-size: 1.05rem;
+.hero-card {
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,248,255,0.82));
+  border-top: 5px solid var(--p04-yellow);
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, #ffd166, #ff8a3d);
+  box-shadow: 0 12px 24px rgba(255, 138, 61, 0.24);
+}
+
+.hero-title-zh { letter-spacing: 0.02em; }
+.hero-title-en { color: var(--p04-blue); font-weight: 800; }
+.slogan {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 209, 102, 0.22);
+  color: #9a5b00;
   font-weight: 800;
-  color: #7a4b1e;
-  margin-bottom: 8px;
 }
 
-.flower-message {
-  font-size: 1rem;
-  line-height: 1.65;
-  color: #3e3329;
+.content-card {
+  border-radius: 30px;
+  background: rgba(255,255,255,0.88);
 }
 
-.flower-message strong {
-  color: #a94b36;
+.stats-card {
+  background: linear-gradient(135deg, #ffffff, #eef8ff);
+  border: 2px solid rgba(47,128,237,0.14);
+  border-radius: 24px;
+}
+
+.stats-value { color: var(--p04-orange); }
+
+.btn {
+  border-radius: 18px;
   font-weight: 900;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
 
-.flower-subtitle {
-  margin-top: 10px;
-  font-size: 0.88rem;
-  color: #7a6a58;
-}
+.btn:hover { transform: translateY(-2px); filter: saturate(1.05); }
+.btn-primary { background: linear-gradient(135deg, var(--p04-blue), var(--p04-sky)); }
+.btn-accent { background: linear-gradient(135deg, var(--p04-orange), #ffb84d); }
+.btn-secondary { background: #f3f6fb; color: var(--p04-ink); }
 
-@keyframes p04FlowerIn {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.96);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(-2px) scale(1.015);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-
-/* P04 V2.7 我的紀錄表格：遊戲化教育風 */
-.my-records-wrap {
+.game-dashboard-section {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  margin-top: 20px;
+}
+
+.leaderboard-card {
+  border-radius: 24px;
+  background: rgba(255,255,255,0.86);
+}
+
+.leaderboard-card h3 {
+  font-weight: 900;
+  color: var(--p04-blue);
+}
+
+.leaderboard-list li {
+  border-radius: 14px;
+  margin-bottom: 8px;
+  background: rgba(248,250,252,0.94);
+  border: 1px solid var(--p04-line);
+}
+
+.rank-order {
+  color: var(--p04-orange);
+  font-weight: 950;
+}
+
+.my-records-section {
+  margin-top: 22px;
+  padding-top: 6px;
+}
+
+.my-records-header {
+  text-align: center;
+  margin: 10px auto 16px;
+}
+
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(47,128,237,0.10);
+  color: var(--p04-blue);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.my-records-header h2 {
+  margin: 8px 0 4px;
+  font-size: 1.35rem;
+  font-weight: 950;
+  color: var(--p04-ink);
+}
+
+.my-records-header p {
+  margin: 0;
+  color: var(--p04-muted);
+  font-size: 0.92rem;
+}
+
+.my-records-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .record-panel {
-  background: #ffffff;
-  border: 3px solid #ffd54f;
-  border-radius: 22px;
+  border-radius: 26px;
   padding: 16px;
-  box-shadow: 0 10px 24px rgba(45, 64, 90, 0.12);
+  background: rgba(255,255,255,0.90);
+  position: relative;
+  overflow: hidden;
 }
 
-.record-panel-title {
-  font-size: 1.12rem;
-  font-weight: 900;
-  color: #ef6c00;
-  margin-bottom: 4px;
+.record-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--p04-yellow), var(--p04-sky));
 }
 
-.record-panel-subtitle {
-  font-size: 0.88rem;
-  color: #6b7280;
+.record-panel-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 12px;
+}
+
+.record-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,209,102,.55), rgba(86,204,242,.35));
+  font-size: 1.45rem;
+}
+
+.record-panel h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 950;
+  color: var(--p04-ink);
+}
+
+.record-panel p {
+  margin: 3px 0 0;
+  color: var(--p04-muted);
+  font-size: 0.84rem;
 }
 
 .record-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   overflow: hidden;
-  border-radius: 14px;
-  font-size: 0.9rem;
+  border-radius: 16px;
+  font-size: 0.88rem;
+  border: 1px solid var(--p04-line);
 }
 
 .record-table th {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: #eef7ff;
+  color: #1769c2;
   text-align: left;
   padding: 9px 8px;
-  font-weight: 900;
+  font-weight: 950;
 }
 
 .record-table td {
-  border-bottom: 1px solid #eef2f7;
-  padding: 9px 8px;
+  padding: 10px 8px;
+  border-top: 1px solid rgba(31,41,55,0.07);
   vertical-align: top;
 }
 
-.record-table tr:nth-child(even) td {
-  background: #fffaf0;
+.record-table tr:nth-child(even) td { background: rgba(255, 248, 232, 0.55); }
+
+.record-pill {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(47,128,237,0.10);
+  color: var(--p04-blue);
+  font-size: 0.78rem;
+  font-weight: 900;
 }
 
 .record-pagination {
@@ -432,35 +545,41 @@ input {
   justify-content: space-between;
   gap: 8px;
   margin-top: 12px;
-  font-size: 0.88rem;
-  color: #4b5563;
+  font-size: 0.86rem;
+  color: var(--p04-muted);
 }
 
 .record-pagination button {
-  border: none;
+  border: 0;
   border-radius: 999px;
   padding: 8px 12px;
-  background: #4fc3f7;
+  background: linear-gradient(135deg, var(--p04-blue), var(--p04-sky));
   color: white;
-  font-weight: 800;
+  font-weight: 900;
   cursor: pointer;
 }
 
 .record-pagination button:disabled {
-  opacity: 0.45;
+  opacity: 0.42;
   cursor: not-allowed;
 }
 
-.record-empty,
-.record-error {
-  padding: 14px;
-  border-radius: 14px;
-  background: #f8fafc;
-  color: #6b7280;
+.record-empty, .record-error {
+  padding: 16px;
+  border-radius: 16px;
   text-align: center;
+  background: #f8fafc;
+  color: var(--p04-muted);
+  border: 1px dashed rgba(31,41,55,0.16);
 }
 
 .record-error {
   background: #fff1f2;
   color: #c62828;
+}
+
+@media (max-width: 760px) {
+  .game-dashboard-section, .my-records-grid { grid-template-columns: 1fr; }
+  .record-table { font-size: 0.82rem; }
+  .record-table th, .record-table td { padding: 8px 6px; }
 }

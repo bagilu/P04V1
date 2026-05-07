@@ -78,7 +78,7 @@
 
       <p id="indexMessage" class="status-message"></p>
 
-      <section class="leaderboard-section">
+      <section class="leaderboard-section game-dashboard-section">
         <div class="leaderboard-card leaderboard-card-primary-light">
           <h3>前 10 名微笑王</h3>
           <ol id="smilerRankingList" class="leaderboard-list">
@@ -92,12 +92,42 @@
           </ol>
         </div>
       </section>
-      <section id="myRecordsSection"></section>
+
+      <section id="myRecordsSection" class="my-records-section">
+        <div class="my-records-header">
+          <div class="section-kicker">My Smile Log</div>
+          <h2>我的微笑與回應紀錄</h2>
+          <p>每頁顯示 10 筆，方便回顧自己在校園裡創造與收到的善意漣漪。</p>
+        </div>
+
+        <div class="my-records-grid">
+          <article class="record-panel record-panel-smile">
+            <div class="record-panel-title-row">
+              <div class="record-icon">🌞</div>
+              <div>
+                <h3>我的微笑紀錄</h3>
+                <p>別人記錄了我對他的微笑、問候或鼓勵</p>
+              </div>
+            </div>
+            <div id="mySmileRecordsBody" class="record-table-body">載入中…</div>
+          </article>
+
+          <article class="record-panel record-panel-response">
+            <div class="record-panel-title-row">
+              <div class="record-icon">🌱</div>
+              <div>
+                <h3>我的回應紀錄</h3>
+                <p>我記錄了別人給我的微笑、問候或鼓勵</p>
+              </div>
+            </div>
+            <div id="myResponseRecordsBody" class="record-table-body">載入中…</div>
+          </article>
+        </div>
+      </section>
     </main>
   </div>
 
   <script src="config.js"></script>
   <script src="app.js"></script>
-  <script src="my_records_component.js"></script>
 </body>
 </html>

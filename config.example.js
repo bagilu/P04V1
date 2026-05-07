@@ -13,8 +13,10 @@ window.APP_CONFIG = {
     SUBMIT_SMILE_EVENT: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_submit_smile_event',
     GET_HOME_STATS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_home_stats',
     GET_RECORDS_BY_DATE: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_records_by_date',
-    GET_RECENT_NOTIFICATIONS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_recent_notifications'
+    GET_RECENT_NOTICE: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_recent_notice',
+    GET_MY_RECORDS: 'https://YOUR-PROJECT.supabase.co/functions/v1/P04_get_my_records'
   },
 
-  NOTIFICATION_POLL_MS: 5000
+  NOTIFICATION_POLL_MS: 3000,
+  NOTIFICATION_DISPLAY_MS: 8000
 };
