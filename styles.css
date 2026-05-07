@@ -370,3 +370,97 @@ input {
     transform: translateY(0) scale(1);
   }
 }
+
+
+/* P04 V2.7 我的紀錄表格：遊戲化教育風 */
+.my-records-wrap {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.record-panel {
+  background: #ffffff;
+  border: 3px solid #ffd54f;
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 10px 24px rgba(45, 64, 90, 0.12);
+}
+
+.record-panel-title {
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: #ef6c00;
+  margin-bottom: 4px;
+}
+
+.record-panel-subtitle {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.record-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 14px;
+  font-size: 0.9rem;
+}
+
+.record-table th {
+  background: #e3f2fd;
+  color: #1565c0;
+  text-align: left;
+  padding: 9px 8px;
+  font-weight: 900;
+}
+
+.record-table td {
+  border-bottom: 1px solid #eef2f7;
+  padding: 9px 8px;
+  vertical-align: top;
+}
+
+.record-table tr:nth-child(even) td {
+  background: #fffaf0;
+}
+
+.record-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 0.88rem;
+  color: #4b5563;
+}
+
+.record-pagination button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #4fc3f7;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.record-pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.record-empty,
+.record-error {
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #6b7280;
+  text-align: center;
+}
+
+.record-error {
+  background: #fff1f2;
+  color: #c62828;
+}
